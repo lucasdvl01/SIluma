@@ -14,8 +14,7 @@ public class AuthDTOs {
     @AllArgsConstructor
     @Builder
     public static class LoginRequest {
-        @NotBlank(message = "O e-mail é obrigatório")
-        @Email(message = "E-mail inválido")
+        @NotBlank(message = "O e-mail ou usuário é obrigatório")
         private String email;
 
         @NotBlank(message = "A senha é obrigatória")

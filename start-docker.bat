@@ -5,9 +5,19 @@ echo   SISTEMA DE GESTÃO DE ILUMINAÇÃO INTELIGENTE PARA MINAS - SENAI BETIM
 echo   INICIALIZAÇÃO VIA DOCKER COMPOSE (MySQL + Backend + Frontend)
 echo =======================================================================
 echo.
+docker info > nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERRO] O serviço do Docker Desktop não está em execução no seu computador.
+    echo.
+    echo Sugestão:
+    echo  1. Abra o aplicativo 'Docker Desktop' e aguarde inicializar, OU
+    echo  2. Execute o arquivo 'start-local.bat' para rodar localmente sem precisar de Docker!
+    echo.
+    pause
+    exit /b 1
+)
 
 docker compose up -d --build
-
 echo.
 echo =======================================================================
 echo  CONTAINERS EM EXECUÇÃO!
