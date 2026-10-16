@@ -1,16 +1,16 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-5">
     <!-- Header Page -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h2 class="text-2xl font-black text-white tracking-tight flex items-center gap-2">
-          <span>Painel de Indicadores & Eficiência</span>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+        <h2 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+          <span>Painel de Indicadores Operacionais & Eficiência</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1e293b] text-slate-300 border border-[#334155]">
             RF05
           </span>
         </h2>
         <p class="text-xs text-slate-400">
-          Visão holística em tempo real da operação autônoma de iluminação das minas
+          Monitoramento consolidado de consumo, autonomia e disponibilidade da frota de torres
         </p>
       </div>
 
@@ -18,169 +18,177 @@
         <button
           @click="fetchStats"
           :disabled="loading"
-          class="px-3.5 py-2 rounded-xl bg-mina-900 hover:bg-mina-800 text-xs font-semibold text-slate-300 border border-mina-darkBorder flex items-center gap-2 transition-all"
+          class="px-3 py-1.5 rounded bg-[#0e1626] hover:bg-[#16233b] text-xs font-semibold text-slate-300 border border-[#1c273c] flex items-center gap-2 transition-colors"
         >
           <RefreshCw class="w-3.5 h-3.5" :class="{ 'animate-spin': loading }" />
-          Recarregar Métricas
+          <span>Atualizar Métricas</span>
         </button>
       </div>
     </div>
 
-    <!-- KPI Cards (RF05) -->
+    <!-- Metricas Principais CCO (RF05) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Card 1: Torres em Funcionamento -->
-      <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5 relative overflow-hidden">
+      <!-- Card 1: Torres em Operação -->
+      <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold text-slate-400">Torres em Operação</p>
-            <h3 class="text-3xl font-black text-white mt-1">
+            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Torres Ativas no Campo</span>
+            <div class="text-2xl font-bold font-mono text-white mt-1">
               {{ stats.torresOperacionais + stats.torresAlertaVisibilidade }}
-              <span class="text-sm font-semibold text-slate-500">/ {{ stats.totalTorres }}</span>
-            </h3>
+              <span class="text-xs font-normal text-slate-500 font-sans">/ {{ stats.totalTorres }} total</span>
+            </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold">
-            💡
+          <div class="w-8 h-8 rounded bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <RadioTower class="w-4 h-4" />
           </div>
         </div>
-        <div class="mt-4 flex items-center gap-2 text-xs">
-          <span class="flex items-center text-emerald-400 font-bold">
-            {{ Math.round(((stats.torresOperacionais + stats.torresAlertaVisibilidade) / (stats.totalTorres || 1)) * 100) }}%
-          </span>
-          <span class="text-slate-500">da frota com iluminação ativa</span>
-        </div>
-        <div class="w-full bg-mina-800 h-1.5 rounded-full mt-2 overflow-hidden">
-          <div
-            class="bg-emerald-500 h-full rounded-full transition-all duration-500"
-            :style="{ width: `${((stats.torresOperacionais + stats.torresAlertaVisibilidade) / (stats.totalTorres || 1)) * 100}%` }"
-          ></div>
+        <div class="mt-3">
+          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+            <span>Disponibilidade Operacional</span>
+            <span class="font-mono text-emerald-400 font-bold">
+              {{ Math.round(((stats.torresOperacionais + stats.torresAlertaVisibilidade) / (stats.totalTorres || 1)) * 100) }}%
+            </span>
+          </div>
+          <div class="w-full bg-[#162033] h-1.5 rounded-full overflow-hidden">
+            <div
+              class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+              :style="{ width: `${((stats.torresOperacionais + stats.torresAlertaVisibilidade) / (stats.totalTorres || 1)) * 100}%` }"
+            ></div>
+          </div>
         </div>
       </div>
 
-      <!-- Card 2: Consumo Energético Global -->
-      <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5 relative overflow-hidden">
+      <!-- Card 2: Consumo Energético -->
+      <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold text-slate-400">Consumo Energético</p>
-            <h3 class="text-3xl font-black text-amber-400 mt-1">
-              {{ stats.consumoTotalKWh }} <span class="text-xs font-bold text-slate-400">kWh</span>
-            </h3>
+            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Consumo Global</span>
+            <div class="text-2xl font-bold font-mono text-amber-400 mt-1">
+              {{ stats.consumoTotalKWh }} <span class="text-xs font-normal text-slate-400 font-sans">kWh</span>
+            </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold">
-            ⚡
+          <div class="w-8 h-8 rounded bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <Zap class="w-4 h-4" />
           </div>
         </div>
-        <div class="mt-4 flex items-center gap-2 text-xs">
-          <span class="text-slate-400 font-medium">Horas contínuas registradas:</span>
-          <span class="text-white font-bold">{{ stats.totalHorasAtividade }}h</span>
+        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-[#162033]">
+          <span>Horímetro Consolidado:</span>
+          <span class="font-mono text-slate-200 font-bold">{{ stats.totalHorasAtividade }} h</span>
         </div>
       </div>
 
       <!-- Card 3: Diesel Economizado -->
-      <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5 relative overflow-hidden">
+      <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold text-slate-400">Diesel Economizado</p>
-            <h3 class="text-3xl font-black text-sky-400 mt-1">
-              {{ stats.litrosDieselEconomizados }} <span class="text-xs font-bold text-slate-400">L</span>
-            </h3>
+            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Diesel Evitado</span>
+            <div class="text-2xl font-bold font-mono text-sky-400 mt-1">
+              {{ stats.litrosDieselEconomizados }} <span class="text-xs font-normal text-slate-400 font-sans">Litros</span>
+            </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center font-bold">
-            🛢️
+          <div class="w-8 h-8 rounded bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+            <Fuel class="w-4 h-4" />
           </div>
         </div>
-        <div class="mt-4 flex items-center gap-2 text-xs">
-          <span class="text-sky-300 font-semibold">Tecnologia Solar & Híbrida</span>
+        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-[#162033]">
+          <span>Geração Sustentável:</span>
+          <span class="font-mono text-sky-300 font-bold">{{ stats.economiaGeradaKWh }} kWh</span>
         </div>
       </div>
 
-      <!-- Card 4: Redução de CO2 -->
-      <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5 relative overflow-hidden">
+      <!-- Card 4: Redução de Emissões de CO2 -->
+      <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-semibold text-slate-400">CO₂ Não Emitido</p>
-            <h3 class="text-3xl font-black text-emerald-400 mt-1">
-              {{ stats.reducaoCO2Kg }} <span class="text-xs font-bold text-slate-400">kg</span>
-            </h3>
+            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Redução de CO₂</span>
+            <div class="text-2xl font-bold font-mono text-emerald-400 mt-1">
+              {{ stats.reducaoCO2Kg }} <span class="text-xs font-normal text-slate-400 font-sans">kg</span>
+            </div>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold">
-            🌱
+          <div class="w-8 h-8 rounded bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <Leaf class="w-4 h-4" />
           </div>
         </div>
-        <div class="mt-4 flex items-center gap-2 text-xs">
-          <span class="text-emerald-400 font-bold">Sustentabilidade SENAI</span>
+        <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-[#162033]">
+          <span>Eficiência Ambiental:</span>
+          <span class="text-emerald-400 font-bold">Painéis Solares</span>
         </div>
       </div>
     </div>
 
-    <!-- Gráficos de Eficiência e Setores (RF05) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Gráfico 1: Status da Frota (Doughnut) -->
-      <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5 flex flex-col">
-        <h4 class="text-sm font-bold text-white mb-1 flex items-center justify-between">
-          <span>Status da Frota em Campo</span>
-          <span class="text-[10px] text-slate-500 uppercase tracking-wider">Cores Semafóricas</span>
-        </h4>
-        <p class="text-xs text-slate-400 mb-4">Monitoramento do estado operacional das luminárias</p>
-        <div class="relative flex-1 min-h-[220px] flex items-center justify-center">
+    <!-- Seção de Gráficos Técnicos (RF05) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Gráfico 1: Status da Frota -->
+      <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4 flex flex-col">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-xs font-bold text-white uppercase tracking-wider">Distribuição por Status</span>
+          <span class="text-[10px] font-mono text-slate-400">SCADA CORES</span>
+        </div>
+        <div class="relative flex-1 min-h-[210px] flex items-center justify-center">
           <canvas ref="statusChartCanvas"></canvas>
         </div>
       </div>
 
-      <!-- Gráfico 2: Consumo por Setor da Mina (Bar) -->
-      <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5 flex flex-col">
-        <h4 class="text-sm font-bold text-white mb-1">Distribuição por Setor / Frentes</h4>
-        <p class="text-xs text-slate-400 mb-4">Total de torres ativas por trecho da lavra</p>
-        <div class="relative flex-1 min-h-[220px]">
+      <!-- Gráfico 2: Atividade por Setor -->
+      <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4 flex flex-col">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-xs font-bold text-white uppercase tracking-wider">Torres por Setor da Mina</span>
+          <span class="text-[10px] font-mono text-slate-400">FRENTES</span>
+        </div>
+        <div class="relative flex-1 min-h-[210px]">
           <canvas ref="sectorChartCanvas"></canvas>
         </div>
       </div>
 
-      <!-- Gráfico 3: Matriz Energética (Pie) -->
-      <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5 flex flex-col">
-        <h4 class="text-sm font-bold text-white mb-1">Matriz Energética da Frota</h4>
-        <p class="text-xs text-slate-400 mb-4">Fontes de energia utilizadas (Solar, Diesel, Bateria, Híbrido)</p>
-        <div class="relative flex-1 min-h-[220px] flex items-center justify-center">
+      <!-- Gráfico 3: Matriz Energética -->
+      <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4 flex flex-col">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-xs font-bold text-white uppercase tracking-wider">Matriz de Fontes</span>
+          <span class="text-[10px] font-mono text-slate-400">ENERGIA</span>
+        </div>
+        <div class="relative flex-1 min-h-[210px] flex items-center justify-center">
           <canvas ref="powerChartCanvas"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Alertas Operacionais e Preventivos (RF02, RF04) -->
-    <div class="bg-mina-900 border border-mina-darkBorder rounded-2xl p-5">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h4 class="text-sm font-bold text-white flex items-center gap-2">
-            <AlertTriangle class="w-4 h-4 text-amber-500" />
-            Alertas Críticos & Preventivos em Campo
-          </h4>
-          <p class="text-xs text-slate-400">Detecções automatizadas de cerração (IoT), limite de horímetro e baterias</p>
+    <!-- Feed de Ocorrências e Alertas Preventivos (RF02, RF04) -->
+    <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl p-4">
+      <div class="flex items-center justify-between mb-3 border-b border-[#1c273c] pb-2.5">
+        <div class="flex items-center gap-2">
+          <AlertTriangle class="w-4 h-4 text-amber-500" />
+          <span class="text-xs font-bold text-white uppercase tracking-wider">
+            Ocorrências em Campo & Horímetro Preventivo
+          </span>
         </div>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-mina-800 text-slate-300 font-bold">
-          {{ stats.alertasRecentes?.length || 0 }} pendentes
+        <span class="text-[11px] font-mono text-slate-400">
+          {{ stats.alertasRecentes?.length || 0 }} registros ativos
         </span>
       </div>
 
-      <div v-if="stats.alertasRecentes && stats.alertasRecentes.length > 0" class="space-y-2">
+      <div v-if="stats.alertasRecentes && stats.alertasRecentes.length > 0" class="divide-y divide-[#162033]">
         <div
           v-for="(alerta, idx) in stats.alertasRecentes"
           :key="idx"
-          class="p-3.5 rounded-xl border flex items-center justify-between transition-all"
-          :class="alerta.nivelGravidade === 'CRÍTICO' ? 'bg-red-500/10 border-red-500/30 text-red-200' : 'bg-amber-500/10 border-amber-500/30 text-amber-200'"
+          class="py-2.5 flex items-center justify-between text-xs"
         >
           <div class="flex items-center gap-3">
-            <span class="px-2 py-0.5 rounded font-black text-xs" :class="alerta.nivelGravidade === 'CRÍTICO' ? 'bg-red-500/30 text-red-300' : 'bg-amber-500/30 text-amber-300'">
+            <span
+              class="font-mono font-bold text-[11px] px-2 py-0.5 rounded border"
+              :class="alerta.nivelGravidade === 'CRÍTICO' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'"
+            >
               {{ alerta.codigoTorre }}
             </span>
             <div>
-              <p class="text-xs font-bold">{{ alerta.tipoAlerta }}</p>
-              <p class="text-[11px] text-slate-400">Gravidade: {{ alerta.nivelGravidade }}</p>
+              <span class="text-slate-200 font-medium">{{ alerta.tipoAlerta }}</span>
+              <span class="text-[10px] text-slate-500 font-mono ml-2">Nível: {{ alerta.nivelGravidade }}</span>
             </div>
           </div>
-          <span class="text-[11px] text-slate-400 font-mono">{{ alerta.dataHora }}</span>
+          <span class="font-mono text-slate-500 text-[10px]">{{ alerta.dataHora }}</span>
         </div>
       </div>
-      <div v-else class="text-center py-6 text-slate-500 text-xs">
-        ✅ Todas as torres estão operando em condições nominais sem alertas críticos.
+      <div v-else class="text-center py-4 text-slate-500 text-xs font-mono">
+        Nenhuma ocorrência crítica ativa no momento.
       </div>
     </div>
   </div>
@@ -189,7 +197,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import api from '../services/api';
-import { RefreshCw, AlertTriangle } from 'lucide-vue-next';
+import { RefreshCw, RadioTower, Zap, Fuel, Leaf, AlertTriangle } from 'lucide-vue-next';
 import Chart from 'chart.js/auto';
 
 const loading = ref(false);
@@ -246,9 +254,9 @@ const renderCharts = () => {
         labels: labels,
         datasets: [{
           data: data,
-          backgroundColor: ['#10b981', '#f59e0b', '#6b7280', '#ef4444'],
-          borderWidth: 2,
-          borderColor: '#111b2d',
+          backgroundColor: ['#10b981', '#f59e0b', '#64748b', '#ef4444'],
+          borderWidth: 1,
+          borderColor: '#0e1626',
         }]
       },
       options: {
@@ -257,10 +265,10 @@ const renderCharts = () => {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#94a3b8', font: { size: 10, family: 'Plus Jakarta Sans' }, boxWidth: 10 }
+            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 8 }
           }
         },
-        cutout: '70%'
+        cutout: '72%'
       }
     });
   }
@@ -279,16 +287,16 @@ const renderCharts = () => {
         labels: sectorLabels,
         datasets: [
           {
-            label: 'Torres Ligadas',
+            label: 'Ativas',
             data: ativasData,
             backgroundColor: '#f59e0b',
-            borderRadius: 6
+            borderRadius: 3
           },
           {
-            label: 'Total Alocadas',
+            label: 'Total',
             data: totalData,
-            backgroundColor: '#1e3250',
-            borderRadius: 6
+            backgroundColor: '#1e293b',
+            borderRadius: 3
           }
         ]
       },
@@ -297,12 +305,12 @@ const renderCharts = () => {
         maintainAspectRatio: false,
         scales: {
           x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } },
-          y: { ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: '#1c2e4a' } }
+          y: { ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: '#162033' } }
         },
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10 }
+            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 8 }
           }
         }
       }
@@ -323,8 +331,8 @@ const renderCharts = () => {
         datasets: [{
           data: data,
           backgroundColor: ['#38bdf8', '#fbbf24', '#a855f7', '#34d399'],
-          borderWidth: 2,
-          borderColor: '#111b2d',
+          borderWidth: 1,
+          borderColor: '#0e1626',
         }]
       },
       options: {
@@ -333,7 +341,7 @@ const renderCharts = () => {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 10 }
+            labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 8 }
           }
         }
       }

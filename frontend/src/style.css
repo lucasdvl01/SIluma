@@ -4,36 +4,43 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #080c14;
+    color: #e2e8f0;
   }
+
   code, pre {
     font-family: 'JetBrains Mono', monospace;
   }
 }
 
-/* Custom Scrollbars */
+/* Custom Scrollbars elegantes e industriais */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b1321;
+  background: #0b111e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e3250;
-  border-radius: 3px;
+  background: #1e293b;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2b4772;
+  background: #334155;
 }
 
-/* Glowing effects for mining CCO theme */
-.glow-amber {
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
+/* Utilitários visuais de Centro de Controle Operacional (CCO) */
+.scada-panel {
+  background-color: #0e1524;
+  border: 1px solid #1c273c;
 }
-.glow-emerald {
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+
+.scada-panel:hover {
+  border-color: #273752;
 }
-.glow-red {
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
+
+.scada-subtle {
+  background-color: #090e18;
+  border: 1px solid #162033;
 }

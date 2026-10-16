@@ -1,28 +1,32 @@
 <template>
-  <div class="h-[calc(100vh-8rem)] flex flex-col space-y-4">
-    <!-- Top Filter Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 bg-mina-900 border border-mina-darkBorder p-3 rounded-2xl">
-      <div class="flex items-center gap-3">
-        <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-          <span>Mapa Operacional da Mina</span>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/30">RF08</span>
-        </h3>
-        <!-- Legenda Cores Semafóricas (RF02) -->
-        <div class="hidden sm:flex items-center gap-3 text-xs pl-4 border-l border-mina-darkBorder">
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Operacional</span>
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span> Cerração / Alerta</span>
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Manutenção</span>
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-500"></span> Desligada</span>
+  <div class="h-[calc(100vh-7.5rem)] flex flex-col space-y-3">
+    <!-- Barra Superior de Controle Georreferenciado -->
+    <div class="flex flex-wrap items-center justify-between gap-3 bg-[#0e1626] border border-[#1c273c] px-4 py-2.5 rounded-xl">
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <MapPin class="w-4 h-4 text-emerald-400" />
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider">
+            Posicionamento Geográfico da Frota
+          </h3>
+          <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#162033] text-slate-300 border border-[#22314d]">RF08</span>
+        </div>
+
+        <!-- Legenda de Cores Semafóricas (RF02) -->
+        <div class="hidden sm:flex items-center gap-3 text-xs pl-4 border-l border-[#1c273c]">
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operacional</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Alerta Cerração</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Manutenção</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Desligada</span>
         </div>
       </div>
 
-      <!-- Filtro por Setor -->
+      <!-- Filtro por Setor da Mina -->
       <div class="flex items-center gap-2">
         <select
           v-model="selectedSectorId"
-          class="bg-mina-800 border border-mina-darkBorder rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+          class="bg-[#080d17] border border-[#1e2a40] rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-amber-500"
         >
-          <option :value="null">Todos os Setores da Mina</option>
+          <option :value="null">Todas as Frentes da Mina</option>
           <option v-for="s in towerStore.sectors" :key="s.id" :value="s.id">
             {{ s.nome }}
           </option>
@@ -30,111 +34,113 @@
 
         <button
           @click="resetView"
-          class="px-3 py-1.5 rounded-xl bg-mina-800 hover:bg-mina-700 text-xs font-semibold text-slate-300 border border-mina-darkBorder transition-all"
+          class="px-2.5 py-1 rounded-lg bg-[#080d17] hover:bg-[#162033] text-xs font-medium text-slate-300 border border-[#1e2a40] transition-colors"
         >
-          Centralizar Mina
+          Centralizar Cava
         </button>
       </div>
     </div>
 
-    <!-- Map & Control Drawer Container -->
-    <div class="flex-1 relative rounded-2xl overflow-hidden border border-mina-darkBorder shadow-2xl flex">
-      <!-- Leaflet Map Container -->
+    <!-- Container do Mapa e Drawer Lateral -->
+    <div class="flex-1 relative rounded-xl overflow-hidden border border-[#1c273c] flex">
+      <!-- Mapa Leaflet -->
       <div id="map-container" class="flex-1 h-full w-full z-0"></div>
 
-      <!-- Quick Tower Control Drawer (quando uma torre é selecionada) -->
+      <!-- Drawer de Telemetria e Controle Remoto Imediato (RF03) -->
       <div
         v-if="selectedTower"
-        class="absolute top-4 right-4 w-80 bg-mina-900/95 border border-mina-darkBorder backdrop-blur-xl rounded-2xl shadow-2xl p-5 z-[500] space-y-4 animate-in slide-in-from-right"
+        class="absolute top-3 right-3 w-80 bg-[#0e1626]/95 border border-[#1c273c] backdrop-blur rounded-xl shadow-2xl p-4 z-[500] space-y-4"
       >
-        <div class="flex items-center justify-between border-b border-mina-darkBorder pb-3">
-          <div>
-            <h4 class="text-base font-black text-white flex items-center gap-2">
-              {{ selectedTower.codigoIdentificacao }}
-              <span
-                class="w-2.5 h-2.5 rounded-full"
-                :style="{ backgroundColor: selectedTower.statusCor }"
-              ></span>
-            </h4>
-            <p class="text-[11px] text-slate-400">{{ selectedTower.setorNome }}</p>
+        <div class="flex items-center justify-between border-b border-[#1c273c] pb-2.5">
+          <div class="flex items-center gap-2">
+            <span
+              class="w-2.5 h-2.5 rounded-full"
+              :style="{ backgroundColor: selectedTower.statusCor }"
+            ></span>
+            <div>
+              <h4 class="text-sm font-bold text-white font-mono leading-none">
+                {{ selectedTower.codigoIdentificacao }}
+              </h4>
+              <p class="text-[10px] text-slate-400 mt-0.5">{{ selectedTower.setorNome }}</p>
+            </div>
           </div>
           <button
             @click="selectedTower = null"
-            class="p-1 rounded-lg hover:bg-mina-800 text-slate-400 hover:text-white"
+            class="p-1 rounded hover:bg-[#162033] text-slate-400 hover:text-white text-xs"
           >
             ✕
           </button>
         </div>
 
-        <!-- Status Badges -->
+        <!-- Telemetria Técnica da Torre -->
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2.5 rounded-xl bg-mina-800/80 border border-mina-darkBorder">
-            <span class="text-[10px] text-slate-400 block">Status Operacional</span>
-            <span class="font-bold text-white">{{ selectedTower.statusLabel }}</span>
+          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
+            <span class="text-[10px] text-slate-400 block font-mono">ESTADO</span>
+            <span class="font-bold text-white text-xs">{{ selectedTower.statusLabel }}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-mina-800/80 border border-mina-darkBorder">
-            <span class="text-[10px] text-slate-400 block">Modo de Luz</span>
-            <span class="font-bold text-amber-400">{{ selectedTower.modoOperacaoLabel }}</span>
+          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
+            <span class="text-[10px] text-slate-400 block font-mono">MODO LUZ</span>
+            <span class="font-bold text-amber-400 text-xs">{{ selectedTower.modoOperacaoLabel }}</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-mina-800/80 border border-mina-darkBorder">
-            <span class="text-[10px] text-slate-400 block">Bateria</span>
-            <span class="font-bold text-emerald-400">{{ selectedTower.nivelBateria }}%</span>
+          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
+            <span class="text-[10px] text-slate-400 block font-mono">CARGA BATERIA</span>
+            <span class="font-bold text-emerald-400 font-mono text-xs">{{ selectedTower.nivelBateria }}%</span>
           </div>
-          <div class="p-2.5 rounded-xl bg-mina-800/80 border border-mina-darkBorder">
-            <span class="text-[10px] text-slate-400 block">Horímetro</span>
-            <span class="font-bold text-sky-400">{{ selectedTower.horasAtividadeAcumuladas }}h</span>
+          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
+            <span class="text-[10px] text-slate-400 block font-mono">HORÍMETRO TOTAL</span>
+            <span class="font-bold text-sky-400 font-mono text-xs">{{ selectedTower.horasAtividadeAcumuladas }} h</span>
           </div>
         </div>
 
         <!-- Alerta de Horímetro Preventiva -->
         <div
           v-if="selectedTower.necessitaManutencaoPreventiva"
-          class="p-2.5 bg-amber-500/15 border border-amber-500/30 rounded-xl text-xs text-amber-300 font-semibold flex items-center gap-2"
+          class="p-2 bg-amber-500/10 border border-amber-500/30 rounded text-xs text-amber-300 font-medium flex items-center gap-1.5"
         >
-          <span class="text-base">⚠️</span>
+          <AlertTriangle class="w-3.5 h-3.5 text-amber-400 shrink-0" />
           <span>Atingiu {{ selectedTower.horasAtividadeAcumuladas }}h / limite preventiva ({{ selectedTower.limiteHorasPreventiva }}h)!</span>
         </div>
 
-        <!-- Controles Operacionais Imediatos (RF03) -->
-        <div class="space-y-2 pt-2 border-t border-mina-darkBorder">
-          <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Acionamento Remoto (RF03)</label>
+        <!-- Painel de Acionamento Remoto (RF03) -->
+        <div class="space-y-2 pt-2 border-t border-[#1c273c]">
+          <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">Acionamento Operacional (RF03)</span>
           <div class="grid grid-cols-2 gap-2">
             <button
               @click="toggleTowerPower(selectedTower, true)"
               :disabled="selectedTower.ligada"
-              class="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1.5"
+              class="py-2 rounded bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
             >
-              Ligar Luz
+              Ligar
             </button>
             <button
               @click="toggleTowerPower(selectedTower, false)"
               :disabled="!selectedTower.ligada"
-              class="py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1.5"
+              class="py-2 rounded bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
             >
               Desligar
             </button>
           </div>
 
-          <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block pt-2">Modo de Energia / Iluminação</label>
+          <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block pt-1.5">Ajuste de Modo</span>
           <div class="grid grid-cols-3 gap-1.5">
             <button
               @click="changeMode(selectedTower, 'NORMAL')"
-              class="py-2 px-1 text-[11px] font-bold rounded-lg border transition-all text-center"
-              :class="selectedTower.modoOperacao === 'NORMAL' ? 'bg-amber-500 text-black border-amber-400' : 'bg-mina-800 text-slate-300 border-mina-darkBorder hover:bg-mina-700'"
+              class="py-1.5 text-[11px] font-medium rounded border transition-colors text-center"
+              :class="selectedTower.modoOperacao === 'NORMAL' ? 'bg-amber-500 text-black border-amber-400 font-bold' : 'bg-[#080d17] text-slate-300 border-[#1e2a40] hover:bg-[#162033]'"
             >
               Normal
             </button>
             <button
               @click="changeMode(selectedTower, 'ECONOMIA')"
-              class="py-2 px-1 text-[11px] font-bold rounded-lg border transition-all text-center"
-              :class="selectedTower.modoOperacao === 'ECONOMIA' ? 'bg-sky-500 text-black border-sky-400' : 'bg-mina-800 text-slate-300 border-mina-darkBorder hover:bg-mina-700'"
+              class="py-1.5 text-[11px] font-medium rounded border transition-colors text-center"
+              :class="selectedTower.modoOperacao === 'ECONOMIA' ? 'bg-sky-500 text-black border-sky-400 font-bold' : 'bg-[#080d17] text-slate-300 border-[#1e2a40] hover:bg-[#162033]'"
             >
-              Eco (50%)
+              Eco 50%
             </button>
             <button
               @click="changeMode(selectedTower, 'ALTA_VISIBILIDADE_CERRACAO')"
-              class="py-2 px-1 text-[11px] font-bold rounded-lg border transition-all text-center"
-              :class="selectedTower.modoOperacao === 'ALTA_VISIBILIDADE_CERRACAO' ? 'bg-amber-600 text-white border-amber-400 animate-pulse' : 'bg-mina-800 text-slate-300 border-mina-darkBorder hover:bg-mina-700'"
+              class="py-1.5 text-[11px] font-medium rounded border transition-colors text-center"
+              :class="selectedTower.modoOperacao === 'ALTA_VISIBILIDADE_CERRACAO' ? 'bg-amber-600 text-white border-amber-500 font-bold' : 'bg-[#080d17] text-slate-300 border-[#1e2a40] hover:bg-[#162033]'"
             >
               Cerração
             </button>
@@ -148,6 +154,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue';
 import { useTowerStore } from '../stores/towers';
+import { MapPin, AlertTriangle } from 'lucide-vue-next';
 import L from 'leaflet';
 
 const towerStore = useTowerStore();
@@ -163,7 +170,6 @@ const filteredTowers = computed(() => {
 });
 
 const initMap = () => {
-  // Coordenadas centrais da mina (Betim / MG)
   const defaultCenter = [-19.9750, -44.1950];
 
   map = L.map('map-container', {
@@ -171,10 +177,9 @@ const initMap = () => {
     attributionControl: false
   }).setView(defaultCenter, 15);
 
-  // Camada de Imagem de Satélite de Alta Resolução (Esri Satellite) para visual de mina a céu aberto
+  // Satélite de Alta Precisão (Esri World Imagery)
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 18,
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    maxZoom: 18
   }).addTo(map);
 
   markersLayer = L.layerGroup().addTo(map);
@@ -190,25 +195,24 @@ const renderMarkers = () => {
     const isMaint = tower.status === 'EM_MANUTENCAO';
     const isOff = !tower.ligada;
 
-    let markerColor = '#10b981'; // Verde normal
-    let pulseClass = '';
+    let markerColor = '#10b981'; // Verde operacional
 
     if (isMaint) {
       markerColor = '#ef4444'; // Vermelho
     } else if (isFog) {
-      markerColor = '#f59e0b'; // Amarelo/Âmbar
-      pulseClass = 'animate-ping';
+      markerColor = '#f59e0b'; // Âmbar cerração
     } else if (isOff) {
-      markerColor = '#6b7280'; // Cinza
+      markerColor = '#64748b'; // Cinza
     }
 
+    // Marcador SVG industrial de precisão técnica
     const htmlIcon = `
-      <div class="relative cursor-pointer group flex items-center justify-center">
-        ${isFog ? `<div class="absolute w-8 h-8 rounded-full bg-amber-400 opacity-60 ${pulseClass}"></div>` : ''}
-        <div class="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center shadow-lg text-[11px] font-black text-black z-10" style="background-color: ${markerColor}">
-          💡
+      <div class="relative cursor-pointer flex flex-col items-center">
+        ${isFog ? `<div class="absolute -top-1 w-6 h-6 rounded-full bg-amber-400/40 animate-ping"></div>` : ''}
+        <div class="w-5 h-5 rounded-full border-2 border-[#0e1626] flex items-center justify-center shadow-md text-white font-mono font-bold text-[9px]" style="background-color: ${markerColor}">
+          <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
         </div>
-        <div class="absolute -bottom-5 px-1.5 py-0.5 rounded bg-black/80 text-white font-mono text-[9px] font-bold border border-white/20 whitespace-nowrap">
+        <div class="mt-0.5 px-1 py-0.2 rounded bg-[#0a0f1d] border border-[#1e2a40] text-slate-200 font-mono text-[9px] font-bold whitespace-nowrap">
           ${tower.codigoIdentificacao}
         </div>
       </div>
@@ -216,9 +220,9 @@ const renderMarkers = () => {
 
     const icon = L.divIcon({
       html: htmlIcon,
-      className: 'custom-tower-marker',
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
+      className: 'custom-scada-marker',
+      iconSize: [24, 28],
+      iconAnchor: [12, 14]
     });
 
     const marker = L.marker([tower.latitude, tower.longitude], { icon });
@@ -232,7 +236,6 @@ const renderMarkers = () => {
 
 const toggleTowerPower = async (tower, ligar) => {
   await towerStore.toggleTower(tower.id, ligar);
-  // Atualiza torre selecionada
   const updated = towerStore.towers.find(t => t.id === tower.id);
   if (updated) selectedTower.value = updated;
 };
@@ -267,7 +270,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-.custom-tower-marker {
+.custom-scada-marker {
   background: transparent !important;
   border: none !important;
 }
