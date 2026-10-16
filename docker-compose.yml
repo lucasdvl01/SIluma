@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # SERVIÇO 1: BANCO DE DADOS (MySQL 8.0)
+  # RNF-C02: Banco relacional com volume persistente
+  # ==========================================
+  mysql:
+    image: mysql:8.0
+    container_name: minas_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: iluminacao_minas
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - minas_network
+
+  # ==========================================
+  # SERVIÇO 2: BACKEND (Spring Boot 3 / Java 17)
+  # RNF-C01, RNF-C03: Backend + MySQL sobem com 1 comando
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: minas_backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: iluminacao_minas
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+    ports:
+      - "8080:8080"
+    networks:
+      - minas_network
+
+  # ==========================================
+  # SERVIÇO 3: FRONTEND (Vue 3 + Nginx)
+  # RNF-W01, RNF-W14: Container Nginx com SPA compilada
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: minas_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "3000:80"
+    networks:
+      - minas_network
+
+volumes:
+  mysql_data:
+    name: minas_mysql_volume
+
+networks:
+  minas_network:
+    name: minas_network
+    driver: bridge
