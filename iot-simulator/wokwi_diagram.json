@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "author": "SENAI Betim - Iluminacao Minas",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-photoresistor-sensor", "id": "ldr", "top": -120, "left": -100, "attrs": {} },
+    { "type": "wokwi-rgb-led", "id": "rgbled", "top": -120, "left": 100, "attrs": { "common": "cathode" } },
+    { "type": "wokwi-pushbutton", "id": "btn", "top": 120, "left": -100, "attrs": { "color": "orange", "label": "Cerração" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": -40, "left": 110, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r2", "top": -40, "left": 130, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r3", "top": -40, "left": 150, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:3V3", "ldr:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "ldr:GND", "black", [ "v0" ] ],
+    [ "esp:34", "ldr:AO", "green", [ "v0" ] ],
+    [ "esp:GND.2", "btn:1.l", "black", [ "v0" ] ],
+    [ "esp:14", "btn:2.l", "orange", [ "v0" ] ],
+    [ "esp:GND.2", "rgbled:COM", "black", [ "v0" ] ],
+    [ "esp:25", "r1:1", "red", [ "v0" ] ],
+    [ "r1:2", "rgbled:R", "red", [ "v0" ] ],
+    [ "esp:26", "r2:1", "green", [ "v0" ] ],
+    [ "r2:2", "rgbled:G", "green", [ "v0" ] ],
+    [ "esp:27", "r3:1", "blue", [ "v0" ] ],
+    [ "r3:2", "rgbled:B", "blue", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
