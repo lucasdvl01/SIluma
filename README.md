@@ -4,6 +4,9 @@
 **Área:** Tecnologia da Informação  
 **Stack Tecnológica:** Java 17 (Spring Boot 3.x) + Vue.js 3 (Composition API + TailwindCSS) + MySQL 8.x + Docker + Arduino/ESP32 (Wokwi ou Físico)
 
+> 📘 **Manual Completo do Sistema e Desenvolvimento:**  
+> Consulte o documento oficial detalhado em [MANUAL_DO_SISTEMA_E_DESENVOLVIMENTO.md](./MANUAL_DO_SISTEMA_E_DESENVOLVIMENTO.md) com a explicação exaustiva de cada tela, propósito operacional, engenharia de software e instruções de uso.
+
 ---
 
 ## ⛏️ 1. Sobre o Projeto
