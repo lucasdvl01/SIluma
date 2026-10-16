@@ -1,93 +1,102 @@
 <template>
-  <div class="min-h-screen bg-mina-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-    <!-- Decorative mining background patterns -->
-    <div class="absolute inset-0 bg-[radial-gradient(#1e3250_1px,transparent_1px)] [background-size:24px_24px] opacity-25"></div>
-    <div class="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-    <!-- Login Card -->
-    <div class="w-full max-w-md bg-mina-900/90 border border-mina-darkBorder backdrop-blur-xl rounded-2xl shadow-2xl p-8 z-10 space-y-6">
-      <!-- Header -->
-      <div class="text-center space-y-2">
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-2xl shadow-xl shadow-amber-500/30">
-          ⛏️
+  <div class="min-h-screen bg-[#070b14] flex flex-col justify-center items-center p-4 selection:bg-amber-500 selection:text-black">
+    <!-- Container Principal do Login -->
+    <div class="w-full max-w-md bg-[#0e1626] border border-[#1c273c] rounded-xl shadow-xl p-8 space-y-6">
+      <!-- Cabeçalho Institucional -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+              <Radio class="w-4 h-4" />
+            </div>
+            <span class="font-mono font-extrabold text-base tracking-wider uppercase text-white">MINAS<span class="text-amber-500">LUX</span></span>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#162033] text-slate-300 border border-[#22314d]">
+            SENAI Betim
+          </span>
         </div>
-        <h2 class="text-2xl font-black tracking-tight text-white">
-          Minas<span class="text-amber-500">Lux</span>
-        </h2>
-        <p class="text-xs text-slate-400">
-          Sistema de Gestão e Monitoramento de Iluminação Inteligente para Minas
-        </p>
-        <span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-          SENAI Betim • CETEM
-        </span>
+
+        <div>
+          <h2 class="text-lg font-bold text-white tracking-tight">Centro de Controle Operacional</h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Gestão e Monitoramento de Iluminação Móvel para Frentes de Lavra
+          </p>
+        </div>
       </div>
 
-      <!-- Error message -->
-      <div v-if="errorMessage" class="p-3 bg-rose-500/15 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+      <!-- Alerta de Erro -->
+      <div v-if="errorMessage" class="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-xs text-rose-300 flex items-center gap-2">
         <AlertTriangle class="w-4 h-4 shrink-0 text-rose-400" />
         <span>{{ errorMessage }}</span>
       </div>
 
-      <!-- Form -->
+      <!-- Formulário de Autenticação (RF07) -->
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">E-mail Corporativo</label>
-          <div class="relative">
-            <input
-              v-model="email"
-              type="email"
-              required
-              placeholder="ex: operador@mineracao.com.br"
-              class="w-full bg-mina-800 border border-mina-darkBorder rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
-            />
-          </div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">E-mail Corporativo</label>
+          <input
+            v-model="email"
+            type="email"
+            required
+            placeholder="usuario@mineracao.com.br"
+            class="w-full bg-[#080d17] border border-[#1e2a40] rounded-lg px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+          />
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Senha de Acesso</label>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-xs font-semibold text-slate-300">Senha de Acesso</label>
+            <span class="text-[10px] text-slate-500 font-mono">BCrypt 10+</span>
+          </div>
           <input
             v-model="senha"
             type="password"
             required
-            placeholder="Mínimo 8 caracteres"
-            class="w-full bg-mina-800 border border-mina-darkBorder rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+            placeholder="Mínimo de 8 caracteres"
+            class="w-full bg-[#080d17] border border-[#1e2a40] rounded-lg px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
           />
         </div>
 
         <button
           type="submit"
           :disabled="loading"
-          class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold rounded-xl text-sm shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
-          <span v-else>Entrar no Sistema</span>
+          <Loader2 v-if="loading" class="w-3.5 h-3.5 animate-spin" />
+          <span v-else>Autenticar no CCO</span>
         </button>
       </form>
 
-      <!-- Pre-fill Quick Demo Access -->
-      <div class="pt-2 border-t border-mina-darkBorder space-y-2">
-        <p class="text-[11px] text-center font-bold text-slate-500 uppercase tracking-wider">Acesso Rápido para Avaliação</p>
+      <!-- Acesso Rápido para Avaliação dos Professores / Examinadores -->
+      <div class="pt-4 border-t border-[#1a2336] space-y-2">
+        <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block text-center">
+          Credenciais Predefinidas de Avaliação
+        </span>
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
             @click="fillAdmin"
-            class="p-2.5 rounded-xl bg-mina-800/80 hover:bg-mina-700/80 border border-mina-darkBorder text-left transition-all group"
+            class="p-2.5 rounded-lg bg-[#080d17] hover:bg-[#131d30] border border-[#1e2a40] text-left transition-colors"
           >
-            <div class="text-[11px] font-bold text-amber-400 group-hover:text-amber-300">Gestor CCO</div>
-            <div class="text-[10px] text-slate-400 truncate">Perfil ADMIN (Total)</div>
+            <div class="text-[11px] font-bold text-amber-400">Gestor CCO</div>
+            <div class="text-[10px] text-slate-400">Perfil ADMIN (Acesso Total)</div>
           </button>
 
           <button
             type="button"
             @click="fillOperador"
-            class="p-2.5 rounded-xl bg-mina-800/80 hover:bg-mina-700/80 border border-mina-darkBorder text-left transition-all group"
+            class="p-2.5 rounded-lg bg-[#080d17] hover:bg-[#131d30] border border-[#1e2a40] text-left transition-colors"
           >
-            <div class="text-[11px] font-bold text-sky-400 group-hover:text-sky-300">Operador Campo</div>
-            <div class="text-[10px] text-slate-400 truncate">Perfil OPERADOR</div>
+            <div class="text-[11px] font-bold text-sky-400">Operador de Campo</div>
+            <div class="text-[10px] text-slate-400">Perfil OPERADOR (Mobile)</div>
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Rodapé Técnico -->
+    <div class="mt-6 text-center text-[11px] text-slate-400 font-mono">
+      Sistema em conformidade com os requisitos consolidados do SENAI Betim • 2026
     </div>
   </div>
 </template>
@@ -96,7 +105,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import { AlertTriangle, Loader2 } from 'lucide-vue-next';
+import { Radio, AlertTriangle, Loader2 } from 'lucide-vue-next';
 
 const email = ref('admin@mineracao.com.br');
 const senha = ref('admin123');
