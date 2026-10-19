@@ -59,11 +59,11 @@
     </div>
 
     <!-- Lista de Ordens de Serviço (Cartões Alinhados e Polidos) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start gap-4">
       <div
         v-for="order in maintenanceStore.orders"
         :key="order.id"
-        class="tactile-panel rounded-2xl p-4.5 flex flex-col justify-between space-y-3.5 transition-all group"
+        class="tactile-panel rounded-2xl p-4.5 flex flex-col gap-3.5 transition-all group"
       >
         <div class="space-y-3">
           <!-- Cabeçalho do Card: Código, Título e Badge sem quebra indesejada -->
