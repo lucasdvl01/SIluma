@@ -56,4 +56,11 @@ public class MaintenanceController {
         String ip = AuditService.getClientIp(request);
         return ResponseEntity.ok(maintenanceService.updateMaintenance(id, dto, email, ip));
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Exclui uma ordem de manutenção")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        maintenanceService.deleteMaintenance(id);
+        return ResponseEntity.noContent().build();
+    }
 }

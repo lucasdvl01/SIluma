@@ -51,7 +51,6 @@ export const useAuthStore = defineStore('auth', {
       }
       const FIFTEEN_MINUTES = 15 * 60 * 1000;
       this.inactivityTimeout = setTimeout(() => {
-        alert('Sessão expirada por inatividade (15 minutos). Por favor, realize o login novamente.');
         this.logout();
         window.location.href = '/login';
       }, FIFTEEN_MINUTES);

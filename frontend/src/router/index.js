@@ -102,7 +102,6 @@ router.beforeEach((to, from, next) => {
 
   // Restrição de acesso a perfis: Operador não acessa rotas de Admin
   if (to.meta.adminOnly && authStore.isOperador) {
-    alert('Acesso Restrito: Seu perfil de OPERADOR não possui permissão para acessar esta área gerencial.');
     return next('/operador');
   }
 

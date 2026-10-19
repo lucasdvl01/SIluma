@@ -4,14 +4,14 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-5">
       <div>
         <div class="flex items-center gap-2 mb-1">
-          <span class="p-1.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <Cpu class="w-4 h-4" />
           </span>
-          <h2 class="text-xl font-bold text-slate-100 tracking-tight">
+          <h1 class="text-xl font-bold text-white tracking-tight font-sans">
             Bancada de Diagnóstico & Telemetria IoT
-          </h2>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-            RF06 • RNF-C10
+          </h1>
+          <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-xl bg-slate-900 text-slate-300 border border-white/10">
+            Hardware ESP32
           </span>
         </div>
         <p class="text-xs text-slate-400">

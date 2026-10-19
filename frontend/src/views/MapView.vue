@@ -1,22 +1,26 @@
 <template>
   <div class="h-[calc(100vh-7.5rem)] flex flex-col space-y-3">
     <!-- Barra Superior de Controle Georreferenciado -->
-    <div class="flex flex-wrap items-center justify-between gap-3 bg-[#0e1626] border border-[#1c273c] px-4 py-2.5 rounded-xl">
+    <header class="flex flex-wrap items-center justify-between gap-3 tactile-panel px-4 py-3 rounded-2xl">
       <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2">
-          <MapPin class="w-4 h-4 text-emerald-400" />
-          <h3 class="text-xs font-bold text-white uppercase tracking-wider">
-            Posicionamento Geográfico da Frota
-          </h3>
-          <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#162033] text-slate-300 border border-[#22314d]">RF08</span>
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <MapPin class="w-4 h-4" />
+          </div>
+          <div>
+            <h1 class="text-xs font-bold text-white uppercase tracking-wider font-mono">
+              Posicionamento Geográfico da Frota
+            </h1>
+            <p class="text-[11px] text-slate-400">Coordenadas em tempo real da cava da mina</p>
+          </div>
         </div>
 
-        <!-- Legenda de Cores Semafóricas (RF02) -->
-        <div class="hidden sm:flex items-center gap-3 text-xs pl-4 border-l border-[#1c273c]">
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Operacional</span>
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Alerta Cerração</span>
+        <!-- Legenda de Cores Semafóricas -->
+        <div class="hidden sm:flex items-center gap-3.5 text-xs pl-4 border-l border-white/5 font-mono text-[11px]">
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Operacional</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Cerração</span>
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Manutenção</span>
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Desligada</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-600"></span> Desligada</span>
         </div>
       </div>
 
@@ -24,7 +28,7 @@
       <div class="flex items-center gap-2">
         <select
           v-model="selectedSectorId"
-          class="bg-[#080d17] border border-[#1e2a40] rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-amber-500"
+          class="bg-slate-950 border border-slate-700/60 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400 font-sans"
         >
           <option :value="null">Todas as Frentes da Mina</option>
           <option v-for="s in towerStore.sectors" :key="s.id" :value="s.id">
@@ -34,119 +38,130 @@
 
         <button
           @click="resetView"
-          class="px-2.5 py-1 rounded-lg bg-[#080d17] hover:bg-[#162033] text-xs font-medium text-slate-300 border border-[#1e2a40] transition-colors"
+          class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-300 border border-white/10 transition-all interactive-lift shadow-sm"
         >
           Centralizar Cava
         </button>
       </div>
-    </div>
+    </header>
 
     <!-- Container do Mapa e Drawer Lateral -->
-    <div class="flex-1 relative rounded-xl overflow-hidden border border-[#1c273c] flex">
+    <div class="flex-1 relative rounded-2xl overflow-hidden border border-white/10 flex shadow-2xl">
       <!-- Mapa Leaflet -->
       <div id="map-container" class="flex-1 h-full w-full z-0"></div>
 
-      <!-- Drawer de Telemetria e Controle Remoto Imediato (RF03) -->
-      <div
-        v-if="selectedTower"
-        class="absolute top-3 right-3 w-80 bg-[#0e1626]/95 border border-[#1c273c] backdrop-blur rounded-xl shadow-2xl p-4 z-[500] space-y-4"
-      >
-        <div class="flex items-center justify-between border-b border-[#1c273c] pb-2.5">
-          <div class="flex items-center gap-2">
-            <span
-              class="w-2.5 h-2.5 rounded-full"
-              :style="{ backgroundColor: selectedTower.statusCor }"
-            ></span>
-            <div>
-              <h4 class="text-sm font-bold text-white font-mono leading-none">
-                {{ selectedTower.codigoIdentificacao }}
-              </h4>
-              <p class="text-[10px] text-slate-400 mt-0.5">{{ selectedTower.setorNome }}</p>
+      <!-- Drawer de Telemetria e Controle Remoto Imediato -->
+      <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 translate-x-4" enter-to-class="opacity-100 translate-x-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+        <div
+          v-if="selectedTower"
+          class="absolute top-4 right-4 w-84 tactile-panel backdrop-blur-xl rounded-2xl shadow-2xl p-4.5 z-[500] space-y-4 border border-white/10"
+        >
+          <div class="flex items-center justify-between border-b border-white/5 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span
+                class="w-3 h-3 rounded-full"
+                :style="{ backgroundColor: selectedTower.statusCor }"
+              ></span>
+              <div>
+                <h4 class="text-sm font-bold text-white font-mono leading-none tracking-wider">
+                  {{ selectedTower.codigoIdentificacao }}
+                </h4>
+                <p class="text-[11px] text-slate-400 mt-1">{{ selectedTower.setorNome }}</p>
+              </div>
+            </div>
+            <button
+              @click="selectedTower = null"
+              class="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white text-xs transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+
+          <!-- Telemetria Técnica da Torre -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/5">
+              <span class="text-[10px] text-slate-400 block font-mono">ESTADO</span>
+              <span class="font-bold text-white text-xs mt-0.5 block">{{ selectedTower.statusLabel }}</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/5">
+              <span class="text-[10px] text-slate-400 block font-mono">MODO DO FEIXE</span>
+              <span class="font-bold text-amber-400 text-xs mt-0.5 block">{{ selectedTower.modoOperacaoLabel }}</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/5">
+              <span class="text-[10px] text-slate-400 block font-mono">BATERIA</span>
+              <span class="font-bold text-emerald-400 font-mono text-xs mt-0.5 block">{{ selectedTower.nivelBateria }}%</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/5">
+              <span class="text-[10px] text-slate-400 block font-mono">HORÍMETRO</span>
+              <span class="font-bold text-sky-400 font-mono text-xs mt-0.5 block">{{ selectedTower.horasAtividadeAcumuladas }} h</span>
             </div>
           </div>
-          <button
-            @click="selectedTower = null"
-            class="p-1 rounded hover:bg-[#162033] text-slate-400 hover:text-white text-xs"
+
+          <!-- Alerta de Horímetro Preventivo -->
+          <div
+            v-if="selectedTower.necessitaManutencaoPreventiva"
+            class="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 font-medium flex items-center gap-2"
           >
-            ✕
-          </button>
-        </div>
-
-        <!-- Telemetria Técnica da Torre -->
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
-            <span class="text-[10px] text-slate-400 block font-mono">ESTADO</span>
-            <span class="font-bold text-white text-xs">{{ selectedTower.statusLabel }}</span>
-          </div>
-          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
-            <span class="text-[10px] text-slate-400 block font-mono">MODO LUZ</span>
-            <span class="font-bold text-amber-400 text-xs">{{ selectedTower.modoOperacaoLabel }}</span>
-          </div>
-          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
-            <span class="text-[10px] text-slate-400 block font-mono">CARGA BATERIA</span>
-            <span class="font-bold text-emerald-400 font-mono text-xs">{{ selectedTower.nivelBateria }}%</span>
-          </div>
-          <div class="p-2 rounded bg-[#080d17] border border-[#162033]">
-            <span class="text-[10px] text-slate-400 block font-mono">HORÍMETRO TOTAL</span>
-            <span class="font-bold text-sky-400 font-mono text-xs">{{ selectedTower.horasAtividadeAcumuladas }} h</span>
-          </div>
-        </div>
-
-        <!-- Alerta de Horímetro Preventiva -->
-        <div
-          v-if="selectedTower.necessitaManutencaoPreventiva"
-          class="p-2 bg-amber-500/10 border border-amber-500/30 rounded text-xs text-amber-300 font-medium flex items-center gap-1.5"
-        >
-          <AlertTriangle class="w-3.5 h-3.5 text-amber-400 shrink-0" />
-          <span>Atingiu {{ selectedTower.horasAtividadeAcumuladas }}h / limite preventiva ({{ selectedTower.limiteHorasPreventiva }}h)!</span>
-        </div>
-
-        <!-- Painel de Acionamento Remoto (RF03) -->
-        <div class="space-y-2 pt-2 border-t border-[#1c273c]">
-          <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">Acionamento Operacional (RF03)</span>
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              @click="toggleTowerPower(selectedTower, true)"
-              :disabled="selectedTower.ligada"
-              class="py-2 rounded bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
-            >
-              Ligar
-            </button>
-            <button
-              @click="toggleTowerPower(selectedTower, false)"
-              :disabled="!selectedTower.ligada"
-              class="py-2 rounded bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
-            >
-              Desligar
-            </button>
+            <TriangleAlert class="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Limite preventiva atingido ({{ selectedTower.limiteHorasPreventiva }}h)!</span>
           </div>
 
-          <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block pt-1.5">Ajuste de Modo</span>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button
-              @click="changeMode(selectedTower, 'NORMAL')"
-              class="py-1.5 text-[11px] font-medium rounded border transition-colors text-center"
-              :class="selectedTower.modoOperacao === 'NORMAL' ? 'bg-amber-500 text-black border-amber-400 font-bold' : 'bg-[#080d17] text-slate-300 border-[#1e2a40] hover:bg-[#162033]'"
-            >
-              Normal
-            </button>
-            <button
-              @click="changeMode(selectedTower, 'ECONOMIA')"
-              class="py-1.5 text-[11px] font-medium rounded border transition-colors text-center"
-              :class="selectedTower.modoOperacao === 'ECONOMIA' ? 'bg-sky-500 text-black border-sky-400 font-bold' : 'bg-[#080d17] text-slate-300 border-[#1e2a40] hover:bg-[#162033]'"
-            >
-              Eco 50%
-            </button>
-            <button
-              @click="changeMode(selectedTower, 'ALTA_VISIBILIDADE_CERRACAO')"
-              class="py-1.5 text-[11px] font-medium rounded border transition-colors text-center"
-              :class="selectedTower.modoOperacao === 'ALTA_VISIBILIDADE_CERRACAO' ? 'bg-amber-600 text-white border-amber-500 font-bold' : 'bg-[#080d17] text-slate-300 border-[#1e2a40] hover:bg-[#162033]'"
-            >
-              Cerração
-            </button>
+          <!-- Acionamento Inequívoco de Energia -->
+          <div class="space-y-2 pt-2 border-t border-white/5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider">Luminária:</span>
+              <span
+                class="px-2 py-0.5 rounded text-[10px] font-mono font-bold"
+                :class="selectedTower.ligada ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'"
+              >
+                {{ selectedTower.ligada ? 'ACESAS' : 'APAGADA' }}
+              </span>
+            </div>
+
+            <div class="segmented-control w-full flex">
+              <button
+                @click="toggleTowerPower(selectedTower, false)"
+                class="flex-1 py-1.5 rounded-lg text-xs font-mono font-bold transition-all text-center"
+                :class="!selectedTower.ligada ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'"
+              >
+                Apagada
+              </button>
+              <button
+                @click="toggleTowerPower(selectedTower, true)"
+                class="flex-1 py-1.5 rounded-lg text-xs font-mono font-bold transition-all text-center"
+                :class="selectedTower.ligada ? 'bg-emerald-500 text-slate-950 shadow-sm font-extrabold' : 'text-slate-400 hover:text-emerald-300'"
+              >
+                Acesa
+              </button>
+            </div>
+
+            <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block pt-1.5">Intensidade & Cor</span>
+            <div class="grid grid-cols-3 gap-1.5">
+              <button
+                @click="changeMode(selectedTower, 'NORMAL')"
+                class="py-1.5 text-[11px] font-medium rounded-xl border transition-all text-center"
+                :class="selectedTower.modoOperacao === 'NORMAL' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 font-bold shadow-sm' : 'bg-slate-950 text-slate-400 border-white/5 hover:bg-slate-900'"
+              >
+                Normal
+              </button>
+              <button
+                @click="changeMode(selectedTower, 'ECONOMIA')"
+                class="py-1.5 text-[11px] font-medium rounded-xl border transition-all text-center"
+                :class="selectedTower.modoOperacao === 'ECONOMIA' ? 'bg-sky-500/20 text-sky-300 border-sky-400 font-bold shadow-sm' : 'bg-slate-950 text-slate-400 border-white/5 hover:bg-slate-900'"
+              >
+                Eco
+              </button>
+              <button
+                @click="changeMode(selectedTower, 'ALTA_VISIBILIDADE_CERRACAO')"
+                class="py-1.5 text-[11px] font-medium rounded-xl border transition-all text-center"
+                :class="selectedTower.modoOperacao === 'ALTA_VISIBILIDADE_CERRACAO' ? 'bg-amber-400 text-slate-950 border-amber-400 font-extrabold shadow-sm' : 'bg-slate-950 text-amber-400/80 border-white/5 hover:bg-slate-900'"
+              >
+                Cerração
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -154,7 +169,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue';
 import { useTowerStore } from '../stores/towers';
-import { MapPin, AlertTriangle } from 'lucide-vue-next';
+import { MapPin, TriangleAlert } from 'lucide-vue-next';
 import L from 'leaflet';
 
 const towerStore = useTowerStore();
@@ -205,14 +220,15 @@ const renderMarkers = () => {
       markerColor = '#64748b'; // Cinza
     }
 
-    // Marcador SVG industrial de precisão técnica
+    // Marcador com feixe de luz realista na cava
     const htmlIcon = `
       <div class="relative cursor-pointer flex flex-col items-center">
-        ${isFog ? `<div class="absolute -top-1 w-6 h-6 rounded-full bg-amber-400/40 animate-ping"></div>` : ''}
-        <div class="w-5 h-5 rounded-full border-2 border-[#0e1626] flex items-center justify-center shadow-md text-white font-mono font-bold text-[9px]" style="background-color: ${markerColor}">
+        ${tower.ligada ? `<div class="absolute -top-3.5 -left-3.5 w-14 h-14 rounded-full pointer-events-none opacity-45" style="background: radial-gradient(circle, ${markerColor} 0%, transparent 70%)"></div>` : ''}
+        ${isFog ? `<div class="absolute -top-1 w-7 h-7 rounded-full bg-amber-400/40 animate-ping"></div>` : ''}
+        <div class="w-6 h-6 rounded-full border-2 border-slate-950 flex items-center justify-center shadow-lg text-white font-mono font-bold text-[9px]" style="background-color: ${markerColor}">
           <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
         </div>
-        <div class="mt-0.5 px-1 py-0.2 rounded bg-[#0a0f1d] border border-[#1e2a40] text-slate-200 font-mono text-[9px] font-bold whitespace-nowrap">
+        <div class="mt-1 px-1.5 py-0.5 rounded-md bg-slate-950/90 border border-white/10 text-slate-100 font-mono text-[9px] font-bold whitespace-nowrap shadow-md">
           ${tower.codigoIdentificacao}
         </div>
       </div>
@@ -221,8 +237,8 @@ const renderMarkers = () => {
     const icon = L.divIcon({
       html: htmlIcon,
       className: 'custom-scada-marker',
-      iconSize: [24, 28],
-      iconAnchor: [12, 14]
+      iconSize: [28, 32],
+      iconAnchor: [14, 16]
     });
 
     const marker = L.marker([tower.latitude, tower.longitude], { icon });

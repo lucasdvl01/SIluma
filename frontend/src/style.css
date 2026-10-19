@@ -5,12 +5,20 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #080c14;
+    background-color: #060911;
     color: #e2e8f0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  code, pre {
+  /* Números tabulares monospaçados para telemetria sem jitter */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  code, pre, .font-mono {
     font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: "zero" 1;
   }
 }
 
@@ -20,27 +28,75 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b111e;
+  background: #080d17;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #1c273c;
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #2b3d5b;
 }
 
-/* Utilitários visuais de Centro de Controle Operacional (CCO) */
+/* Painel Industrial Tátil: Eliminação do visual genérico de template */
+.tactile-panel {
+  background: linear-gradient(180deg, #101726 0%, #0a0e17 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.tactile-well {
+  background: #070a12;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Cones de iluminação física realística emitidos pelas luminárias */
+.beam-cone-amber {
+  background: radial-gradient(ellipse at 50% -20%, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.04) 55%, transparent 75%);
+}
+
+.beam-cone-emerald {
+  background: radial-gradient(ellipse at 50% -20%, rgba(16, 185, 129, 0.20) 0%, rgba(16, 185, 129, 0.03) 55%, transparent 75%);
+}
+
+.beam-cone-sky {
+  background: radial-gradient(ellipse at 50% -20%, rgba(56, 189, 248, 0.20) 0%, rgba(56, 189, 248, 0.03) 55%, transparent 75%);
+}
+
+/* Segmented Control de Alta Precisão (Elimina ambiguidade de toggle) */
+.segmented-control {
+  display: inline-flex;
+  padding: 3px;
+  background-color: #070b13;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
 .scada-panel {
-  background-color: #0e1524;
-  border: 1px solid #1c273c;
+  background-color: #0c1322;
+  border: 1px solid #182438;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .scada-panel:hover {
-  border-color: #273752;
+  border-color: #243552;
 }
 
 .scada-subtle {
-  background-color: #090e18;
-  border: 1px solid #162033;
+  background-color: #080d18;
+  border: 1px solid #141c2c;
+}
+
+/* Efeito de elevação tátil para botões e cartões de alta performance */
+.interactive-lift {
+  transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.interactive-lift:hover {
+  transform: translateY(-1px);
+}
+.interactive-lift:active {
+  transform: translateY(0);
 }

@@ -119,6 +119,11 @@ public class MaintenanceService {
         return toDTO(order);
     }
 
+    @Transactional
+    public void deleteMaintenance(Long id) {
+        maintenanceRepository.deleteById(id);
+    }
+
     private MaintenanceResponseDTO toDTO(MaintenanceOrder order) {
         return MaintenanceResponseDTO.builder()
                 .id(order.getId())

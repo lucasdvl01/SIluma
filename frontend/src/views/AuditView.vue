@@ -1,29 +1,31 @@
 <template>
   <div class="space-y-4 max-w-6xl mx-auto">
     <!-- Header -->
-    <div class="flex justify-between items-center">
+    <header class="flex justify-between items-center pb-4 border-b border-white/5">
       <div>
-        <h2 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-          <span>Trilha de Auditoria & Segurança Operacional</span>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1e293b] text-slate-300 border border-[#334155]">
-            RF12 • RNF-W18
+        <div class="flex items-center gap-2.5">
+          <h1 class="text-xl font-bold text-white tracking-tight font-sans">
+            Trilha de Auditoria & Conformidade
+          </h1>
+          <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-xl bg-slate-900 text-slate-300 border border-white/10">
+            Registro Imutável
           </span>
-        </h2>
-        <p class="text-xs text-slate-400">
-          Rastreabilidade de comandos de acionamento, alteração de modos operacionais, cadastros e endereços IP
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Rastreabilidade de comandos, alteração de modos operacionais, cadastros e endereços IP de origem
         </p>
       </div>
 
       <button
         @click="fetchLogs"
-        class="px-3 py-1.5 rounded-lg bg-[#0e1626] hover:bg-[#16233b] text-xs font-semibold text-slate-300 border border-[#1c273c] flex items-center gap-2 transition-colors"
+        class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-white/10 flex items-center gap-2 transition-all interactive-lift shadow-sm"
       >
         <span>Atualizar Log</span>
       </button>
-    </div>
+    </header>
 
     <!-- Tabela de Auditoria -->
-    <div class="bg-[#0e1626] border border-[#1c273c] rounded-xl overflow-hidden shadow-lg">
+    <div class="tactile-panel rounded-2xl overflow-hidden shadow-2xl">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
