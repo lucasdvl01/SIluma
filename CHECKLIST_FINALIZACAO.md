@@ -25,7 +25,7 @@ Este documento registra o estado conhecido do projeto em **20/10/2026** e organi
 - [x] Backend local validado com login ADMIN e consultas autenticadas somente de leitura via IPv4: torres (8), setores (4), estatísticas do dashboard, manutenções (4) e auditoria (50). OpenAPI respondeu HTTP 200. Nenhuma operação de escrita foi feita.
 - [ ] O smoke test visual anterior usou respostas HTTP simuladas; a validação direta do backend não substitui percorrer os fluxos da interface ligados à API real. Repetir o smoke test integrado com backend antes da entrega.
 - [x] O terminal de operador foi ajustado para acompanhar o tema claro; o build do frontend passou após essa alteração.
-- [ ] As alterações de UX/UI estão apenas locais e ainda precisam de revisão e commit na branch `feature/frontend-vue`.
+- [x] Redesign e documentação revisados, commitados e publicados em `feature/frontend-vue` no commit `909d035`.
 - [x] Criado `docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md` com materiais, pinagem, ligações, segurança e roteiro de testes do protótipo físico; o README do simulador IoT aponta para o guia.
 - [x] Docker Compose foi validado e os serviços MySQL 8, backend Spring Boot e frontend Nginx foram construídos e iniciados.
 - [x] No teste Docker, MySQL ficou saudável, o backend conectou ao MySQL, criou as tabelas e carregou os dados iniciais. Foram observados 2 usuários, 4 setores, 7 torres, 2 ordens de manutenção e nenhuma telemetria.
@@ -46,10 +46,9 @@ Este documento registra o estado conhecido do projeto em **20/10/2026** e organi
   - [ ] Confirmar que o script não anuncia sucesso nem inicia o frontend se a API não ficar disponível no tempo limite.
   - [ ] Confirmar que a limpeza de `backend/target` não apaga `backend/h2_data`.
 - [x] Rodar testes do backend e build do frontend após as alterações: 8 testes passaram usando H2 em memória para não disputar o arquivo H2 da instância local ativa; `npm run build` passou. Repetir a execução limpa antes da entrega final, quando não houver backend local usando o H2.
-- [x] Conferir `git status` e `git diff --check`; os PDFs, os arquivos `.traineddata` e o SVG original foram mantidos fora do escopo previsto para o commit.
-- [ ] Commitar apenas os arquivos pretendidos (o `.bat` e este checklist, se ambos estiverem prontos); não adicionar o PDF ou arquivos de banco.
-- [ ] Enviar o commit para `origin/feature/frontend-vue`.
-- [ ] Abrir um Pull Request de `feature/frontend-vue` para `develop`, revisar o diff e registrar o resultado dos testes.
+- [x] Conferir `git status` e `git diff --check`; os PDFs, os arquivos `.traineddata` e o SVG original foram mantidos fora do commit.
+- [x] Commitar apenas os arquivos pretendidos e enviar para `origin/feature/frontend-vue` (`909d035`).
+- [ ] Abrir um Pull Request de `feature/frontend-vue` para `develop` e registrar os resultados. Não há PR aberto; a criação deve ser concluída em [comparar branches no GitHub](https://github.com/lucasdvl01/SIluma/compare/develop...feature/frontend-vue?expand=1).
 - [ ] Depois da integração em `develop` e da validação final, abrir um Pull Request de `develop` para `main`.
 - [ ] Manter `main` como versão estável; configurar proteção da branch para exigir Pull Request/revisão, se disponível no GitHub.
 
