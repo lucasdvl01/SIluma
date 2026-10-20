@@ -1,53 +1,86 @@
 <template>
-  <header class="h-14 border-b border-mina-700/40 bg-mina-950/80 backdrop-blur-md px-6 flex items-center justify-between z-10 shrink-0 select-none">
+  <header class="app-navbar relative z-30 flex h-16 shrink-0 select-none items-center justify-between gap-2 border-b border-slate-200 bg-white/95 px-3 backdrop-blur-xl sm:px-6">
     <!-- Breadcrumbs Corporativo (About Face: Orientação espacial sem ruído) -->
-    <div class="flex items-center gap-2.5 text-xs">
-      <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-mina-900 border border-mina-700/30 text-[11px] font-mono font-medium text-slate-400">
-        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-        <span>CCO-MINERAÇÃO</span>
+    <div class="flex min-w-0 items-center gap-2 text-xs sm:gap-2.5">
+      <button
+        type="button"
+        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 lg:hidden"
+        :aria-expanded="navigationOpen"
+        aria-controls="primary-navigation"
+        :aria-label="navigationOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'"
+        @click="$emit('toggle-navigation')"
+      >
+        <Menu v-if="!navigationOpen" class="h-5 w-5" />
+        <X v-else class="h-5 w-5" />
+      </button>
+      <div class="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-mono font-semibold tracking-wider text-slate-600 sm:flex">
+        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        <span>SI Luma <span class="text-slate-400">/</span> CCO</span>
       </div>
-      <span class="text-slate-600">/</span>
-      <h1 class="text-slate-100 font-semibold tracking-tight text-xs sm:text-sm">{{ currentTitle }}</h1>
+      <span class="hidden text-slate-300 sm:inline">/</span>
+      <p class="truncate text-sm font-semibold tracking-tight text-slate-800 sm:text-base">{{ currentTitle }}</p>
     </div>
 
     <!-- Quick Actions and Telemetry Status (RVMF: Rich Modeless Feedback) -->
-    <div class="flex items-center gap-3">
+    <div class="flex shrink-0 items-center gap-1.5 sm:gap-3">
+      <ThemeToggle />
+
       <!-- Sync Status Banner if offline queue -->
       <transition enter-active-class="transition duration-150 ease-out" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100">
-        <div v-if="offlineStore.syncMessage" class="px-3 py-1 bg-amber-500/15 border border-amber-500/30 rounded-lg text-xs text-amber-300 font-medium flex items-center gap-2">
-          <RefreshCw class="w-3.5 h-3.5 animate-spin text-amber-400" />
-          <span>{{ offlineStore.syncMessage }}</span>
+        <div v-if="offlineStore.syncMessage" role="status" aria-live="polite" class="flex max-w-40 items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/15 px-2 py-1 text-xs font-medium text-amber-200 sm:max-w-64 sm:px-3">
+          <RefreshCw v-if="offlineStore.syncing" class="w-3.5 h-3.5 animate-spin text-amber-400" />
+          <CheckCircle2 v-else-if="offlineStore.pendingCount === 0" class="w-3.5 h-3.5 text-emerald-400" />
+          <WifiOff v-else class="w-3.5 h-3.5 text-amber-400" />
+          <span class="truncate">{{ offlineStore.syncMessage }}</span>
         </div>
       </transition>
 
-      <!-- Live Polling Indicator -->
-      <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-mina-900 border border-mina-700/30 text-xs">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-        </span>
-        <span class="text-[11px] font-mono text-slate-300 tabular-nums">TELEMETRIA: 10s</span>
+      <div
+        class="hidden items-center gap-2 rounded-lg border px-3 py-1.5 text-xs sm:flex"
+        :class="offlineStore.simulationOffline ? 'border-amber-500/30 bg-amber-500/10' : offlineStore.isOnline ? 'border-emerald-500/20 bg-emerald-500/10' : 'border-rose-500/30 bg-rose-500/10'"
+        role="status"
+        aria-live="polite"
+      >
+        <span class="h-2 w-2 rounded-full" :class="offlineStore.simulationOffline ? 'bg-amber-400' : offlineStore.isOnline ? 'bg-emerald-400' : 'bg-rose-400'"></span>
+        <span class="text-[11px] font-medium text-slate-200">{{ offlineStore.simulationOffline ? 'Offline simulado' : offlineStore.isOnline ? 'Rede detectada' : 'Sem rede' }}</span>
       </div>
 
       <!-- Manual Refresh Button (Direct action, interactive lift) -->
       <button
         @click="refreshData"
         :disabled="loading"
-        class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-mina-900 hover:bg-mina-800 text-slate-200 text-xs font-medium border border-mina-700/40 transition-all interactive-lift disabled:opacity-50"
-        title="Atualizar leituras da frota imediatamente"
+        class="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-wait disabled:opacity-50 sm:min-h-9 sm:min-w-0"
+        aria-label="Atualizar dados das torres"
+        title="Atualizar dados das torres"
       >
-        <RefreshCw class="w-3.5 h-3.5 text-slate-400" :class="{ 'animate-spin': loading }" />
+        <RefreshCw class="h-4 w-4 text-slate-500" :class="{ 'animate-spin': loading }" />
         <span class="hidden sm:inline">Atualizar</span>
       </button>
 
       <!-- Switch to Field Terminal (High visibility, ergonomic) -->
       <router-link
         to="/operador"
-        class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-mina-950 text-xs font-bold transition-all interactive-lift shadow-sm"
+        class="hidden min-h-9 items-center gap-2 rounded-lg bg-amber-400 px-3.5 py-1.5 text-xs font-bold text-mina-950 shadow-sm transition-colors hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 sm:flex"
       >
         <Smartphone class="w-3.5 h-3.5 text-mina-950" />
         <span>Terminal de Campo</span>
       </router-link>
+    </div>
+
+    <div
+      v-if="refreshError"
+      role="alert"
+      class="absolute right-3 top-full z-50 mt-2 flex max-w-[calc(100vw-1.5rem)] items-start gap-3 rounded-xl border border-rose-500/40 bg-rose-950 p-3 text-sm text-rose-100 shadow-elevated sm:right-6 sm:max-w-sm"
+    >
+      <span>{{ refreshError }}</span>
+      <button
+        type="button"
+        aria-label="Dispensar aviso de falha ao atualizar"
+        class="min-h-11 min-w-11 shrink-0 rounded-lg text-rose-200 hover:bg-rose-400/10"
+        @click="refreshError = ''"
+      >
+        <X class="mx-auto h-4 w-4" />
+      </button>
     </div>
   </header>
 </template>
@@ -57,33 +90,48 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useTowerStore } from '../stores/towers';
 import { useOfflineSyncStore } from '../stores/offlineSync';
-import { RefreshCw, Smartphone } from 'lucide-vue-next';
+import ThemeToggle from './ThemeToggle.vue';
+import { CheckCircle2, Menu, RefreshCw, Smartphone, WifiOff, X } from 'lucide-vue-next';
 
+defineProps({
+  navigationOpen: {
+    type: Boolean,
+    default: false
+  }
+});
+
+defineEmits(['toggle-navigation']);
 const route = useRoute();
 const towerStore = useTowerStore();
 const offlineStore = useOfflineSyncStore();
 const loading = ref(false);
+const refreshError = ref('');
 
 const currentTitle = computed(() => {
   const map = {
-    '/dashboard': 'Dashboard de Indicadores Operacionais',
-    '/mapa': 'Mapeamento Georreferenciado da Frota',
-    '/torres': 'Inventário & Telemetria de Torres',
-    '/lote': 'Ações Operacionais em Lote',
-    '/manutencoes': 'Ordens de Serviço & Horímetro',
-    '/auditoria': 'Trilha de Auditoria & Segurança',
-    '/operador': 'Terminal de Campo do Operador',
-    '/simulador-iot': 'Bancada Virtual de Integração IoT',
+    '/dashboard': 'Painel da frota',
+    '/mapa': 'Mapa operacional',
+    '/torres': 'Frota de torres',
+    '/lote': 'Comandos em lote',
+    '/manutencoes': 'Manutenções',
+    '/auditoria': 'Auditoria',
+    '/operador': 'Terminal de campo',
+    '/simulador-iot': 'Simulador IoT',
   };
   return map[route.path] || 'Painel de Gestão';
 });
 
 const refreshData = async () => {
+  if (loading.value) return;
   loading.value = true;
+  refreshError.value = '';
   try {
     await towerStore.fetchTowers();
+  } catch (error) {
+    console.error('Erro ao atualizar os dados das torres:', error);
+    refreshError.value = 'Não foi possível atualizar as torres. Verifique a conexão e tente novamente.';
   } finally {
-    setTimeout(() => { loading.value = false; }, 350);
+    loading.value = false;
   }
 };
 </script>

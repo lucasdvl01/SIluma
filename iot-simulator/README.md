@@ -3,6 +3,9 @@
 **Instituição:** SENAI Betim (CETEM Maria Madalena Nogueira)  
 **Requisitos Atendidos:** RF06, RNF-C10, Item 9 do Documento Oficial do SENAI
 
+Para a lista de materiais, pinagem, segurança elétrica e checklist de montagem e
+testes do protótipo físico, consulte o [Guia de montagem do circuito ESP32](../docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md).
+
 ---
 
 ## 1. Visão Geral da Solução IoT

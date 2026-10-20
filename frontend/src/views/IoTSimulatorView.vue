@@ -1,20 +1,20 @@
 <template>
   <div class="space-y-6 max-w-6xl mx-auto">
     <!-- Top Header SCADA -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-5">
+    <div class="page-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
       <div>
-        <div class="flex items-center gap-2 mb-1">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
           <span class="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <Cpu class="w-4 h-4" />
           </span>
-          <h1 class="text-xl font-bold text-white tracking-tight font-sans">
+          <h1 class="font-sans">
             Bancada de Diagnóstico & Telemetria IoT
           </h1>
           <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-xl bg-slate-900 text-slate-300 border border-white/10">
             Hardware ESP32
           </span>
         </div>
-        <p class="text-xs text-slate-400">
+        <p class="mt-2">
           Ensaio e validação do microcontrolador ESP32 / Arduino em comunicação direta com a API Spring Boot via HTTP REST
         </p>
       </div>
@@ -22,7 +22,7 @@
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-xs">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span class="font-mono text-slate-300 text-[11px]">Wi-Fi: CONECTADO (-62 dBm)</span>
+          <span class="font-mono text-slate-300 text-[11px]">Interface de telemetria IoT</span>
         </div>
         <span class="text-xs font-mono px-2.5 py-1 rounded bg-slate-900 text-amber-400 border border-slate-800">
           POST /api/iot/telemetry
@@ -33,7 +33,7 @@
     <!-- Layout da Bancada Interativa -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Painel Esquerdo: Sensores e Entradas do Dispositivo (7 colunas) -->
-      <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-5">
+      <div class="lg:col-span-7 tactile-panel rounded-2xl p-5 sm:p-6 space-y-5">
         <!-- Cabeçalho do Módulo Hardware -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-3">
           <div class="flex items-center gap-3">
@@ -197,7 +197,7 @@
       <!-- Painel Direito: Atuador LED RGB e Console HTTP (5 colunas) -->
       <div class="lg:col-span-5 space-y-6">
         <!-- Visualização da Luminária / LED RGB (Item 9 SENAI) -->
-        <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
+        <div class="tactile-panel rounded-2xl p-5 sm:p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
             <div class="flex items-center gap-2">
               <Zap class="w-4 h-4 text-amber-400" />
@@ -240,7 +240,7 @@
         </div>
 
         <!-- Terminal / Log HTTP em Tempo Real -->
-        <div class="bg-slate-950 border border-slate-800 rounded-lg p-4 space-y-3">
+        <div class="tactile-panel rounded-2xl p-4 sm:p-5 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2">
             <div class="flex items-center gap-2 text-xs font-mono text-slate-300">
               <Terminal class="w-3.5 h-3.5 text-emerald-400" />

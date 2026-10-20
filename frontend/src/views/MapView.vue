@@ -1,26 +1,25 @@
 <template>
-  <div class="h-[calc(100vh-7.5rem)] flex flex-col space-y-3">
+  <div class="flex h-[calc(100dvh-10rem)] min-h-[520px] flex-col space-y-4">
     <!-- Barra Superior de Controle Georreferenciado -->
-    <header class="flex flex-wrap items-center justify-between gap-3 tactile-panel px-4 py-3 rounded-2xl">
-      <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+    <header class="page-header flex flex-wrap items-start justify-between gap-4 !p-4 sm:!px-5 sm:!py-4">
+      <div class="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-center">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
             <MapPin class="w-4 h-4" />
           </div>
-          <div>
-            <h1 class="text-xs font-bold text-white uppercase tracking-wider font-mono">
-              Posicionamento Geográfico da Frota
-            </h1>
-            <p class="text-[11px] text-slate-400">Coordenadas em tempo real da cava da mina</p>
+          <div class="min-w-0">
+            <p class="page-eyebrow mb-1">Georreferenciamento</p>
+            <h1 class="font-sans">Posicionamento geográfico da frota</h1>
+            <p class="mt-1">Coordenadas das torres por frente da mina</p>
           </div>
         </div>
 
         <!-- Legenda de Cores Semafóricas -->
-        <div class="hidden sm:flex items-center gap-3.5 text-xs pl-4 border-l border-white/5 font-mono text-[11px]">
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Operacional</span>
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Cerração</span>
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Manutenção</span>
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-600"></span> Desligada</span>
+        <div class="hidden items-center gap-3.5 border-l border-white/5 pl-4 font-mono text-[11px] text-slate-500 sm:flex">
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-emerald-400"></span> Operacional</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-400"></span> Cerração</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-rose-500"></span> Manutenção</span>
+          <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-slate-500"></span> Desligada</span>
         </div>
       </div>
 
@@ -46,15 +45,18 @@
     </header>
 
     <!-- Container do Mapa e Drawer Lateral -->
-    <div class="flex-1 relative rounded-2xl overflow-hidden border border-white/10 flex shadow-2xl">
-      <!-- Mapa Leaflet -->
-      <div id="map-container" class="flex-1 h-full w-full z-0"></div>
+    <div class="relative flex min-h-[420px] flex-1">
+      <div class="absolute inset-0 z-0 overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
+        <!-- Mapa Leaflet -->
+        <div id="map-container" class="h-full w-full"></div>
+      </div>
 
       <!-- Drawer de Telemetria e Controle Remoto Imediato -->
       <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 translate-x-4" enter-to-class="opacity-100 translate-x-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
         <div
           v-if="selectedTower"
-          class="absolute top-4 right-4 w-84 tactile-panel backdrop-blur-xl rounded-2xl shadow-2xl p-4.5 z-[500] space-y-4 border border-white/10"
+          class="absolute inset-x-3 top-3 z-[500] max-h-[90%] space-y-4 overflow-y-auto overscroll-contain rounded-2xl border border-white/10 p-5 shadow-2xl backdrop-blur-xl tactile-panel sm:inset-x-auto sm:right-4 sm:top-4 sm:w-[21rem]"
+          aria-label="Controles e dados da torre selecionada"
         >
           <div class="flex items-center justify-between border-b border-white/5 pb-3">
             <div class="flex items-center gap-2.5">

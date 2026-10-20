@@ -1,35 +1,40 @@
 <template>
-  <div class="space-y-4 max-w-6xl mx-auto">
+  <div class="space-y-6 max-w-6xl mx-auto pb-6">
     <!-- Header -->
-    <header class="flex justify-between items-center pb-4 border-b border-white/5">
+    <header class="page-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
       <div>
-        <div class="flex items-center gap-2.5">
-          <h1 class="text-xl font-bold text-white tracking-tight font-sans">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <h1 class="font-sans">
             Trilha de Auditoria & Conformidade
           </h1>
-          <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-xl bg-slate-900 text-slate-300 border border-white/10">
+          <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
             Registro Imutável
           </span>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5">
+        <p class="mt-2">
           Rastreabilidade de comandos, alteração de modos operacionais, cadastros e endereços IP de origem
         </p>
       </div>
 
       <button
         @click="fetchLogs"
-        class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-white/10 flex items-center gap-2 transition-all interactive-lift shadow-sm"
+        :disabled="loading"
+        class="min-h-11 px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-xs font-semibold text-slate-950 flex items-center gap-2 transition-all interactive-lift shadow-sm disabled:cursor-wait disabled:opacity-60"
       >
-        <span>Atualizar Log</span>
+        <span>{{ loading ? 'Atualizando…' : 'Atualizar log' }}</span>
       </button>
     </header>
 
+    <div v-if="errorMessage" role="alert" class="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+      {{ errorMessage }}
+    </div>
+
     <!-- Tabela de Auditoria -->
-    <div class="tactile-panel rounded-2xl overflow-hidden shadow-2xl">
+    <div class="tactile-panel rounded-2xl overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full min-w-[760px] text-left border-collapse">
           <thead>
-            <tr class="border-b border-[#1c273c] bg-[#090e1a] text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+            <tr class="border-b border-white/10 bg-slate-50 text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
               <th class="p-3">Data & Hora</th>
               <th class="p-3">Usuário / Agente</th>
               <th class="p-3">Ação Registrada</th>
@@ -37,11 +42,11 @@
               <th class="p-3">Detalhes do Evento</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#162033] text-xs text-slate-300 font-mono">
+          <tbody class="divide-y divide-white/5 text-xs text-slate-300 font-mono">
             <tr
               v-for="log in logs"
               :key="log.id"
-              class="hover:bg-[#121c2e] transition-colors"
+              class="transition-colors hover:bg-slate-50"
             >
               <td class="p-3 text-[11px] text-slate-400 whitespace-nowrap">
                 {{ formatDate(log.dataHora) }}
@@ -68,6 +73,15 @@
                 {{ log.detalhes }}
               </td>
             </tr>
+            <tr v-if="!loading && !errorMessage && logs.length === 0">
+              <td colspan="5" class="px-6 py-12 text-center font-sans">
+                <p class="text-sm font-semibold text-white">Nenhum registro de auditoria</p>
+                <p class="mt-1 text-xs text-slate-500">As ações registradas aparecerão aqui.</p>
+              </td>
+            </tr>
+            <tr v-if="loading && logs.length === 0">
+              <td colspan="5" class="px-6 py-12 text-center font-sans text-sm text-slate-500">Carregando registros…</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -81,14 +95,17 @@ import api from '../services/api';
 
 const logs = ref([]);
 const loading = ref(false);
+const errorMessage = ref('');
 
 const fetchLogs = async () => {
   loading.value = true;
+  errorMessage.value = '';
   try {
     const res = await api.get('/audit/logs');
     logs.value = res.data;
   } catch (err) {
     console.error('Erro ao buscar auditoria:', err);
+    errorMessage.value = 'Não foi possível carregar os registros. Verifique a conexão e tente novamente.';
   } finally {
     loading.value = false;
   }
@@ -105,7 +122,7 @@ const getActionBadgeClass = (acao) => {
   if (acao.includes('DESLIGAR')) return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
   if (acao.includes('CERRACAO') || acao.includes('ALERTA')) return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
   if (acao.includes('LOTE')) return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30';
-  return 'bg-[#162033] text-slate-300 border-[#22314d]';
+  return 'bg-slate-100 text-slate-700 border-slate-200';
 };
 
 onMounted(() => {

@@ -4,9 +4,11 @@ import api from '../services/api';
 export const useOfflineSyncStore = defineStore('offlineSync', {
   state: () => ({
     isOnline: navigator.onLine,
+    simulationOffline: false,
     queue: JSON.parse(localStorage.getItem('offline_commands_queue') || '[]'),
     syncing: false,
     syncMessage: '',
+    initialized: false,
   }),
 
   getters: {
@@ -15,14 +17,23 @@ export const useOfflineSyncStore = defineStore('offlineSync', {
 
   actions: {
     init() {
+      if (this.initialized) return;
+      this.initialized = true;
+
       window.addEventListener('online', () => {
-        this.isOnline = true;
-        this.syncPendingCommands();
+        this.isOnline = !this.simulationOffline;
+        if (this.isOnline) this.syncPendingCommands();
       });
 
       window.addEventListener('offline', () => {
         this.isOnline = false;
       });
+    },
+
+    setOfflineSimulation(enabled) {
+      this.simulationOffline = enabled;
+      this.isOnline = navigator.onLine && !enabled;
+      if (this.isOnline) this.syncPendingCommands();
     },
 
     // RNF-A10: Feedback tátil (vibração) no dispositivo móvel ao acionar comando
