@@ -108,18 +108,23 @@ try {
                 -TimeoutSec 5 `
                 -ErrorAction Stop
 
-            $command = [ordered]@{
-                alertaAtivado = [bool]$response.alertaAtivado
-                instrucaoLed = [bool]$response.instrucaoLed
+            $command = switch ([string]$response.corLedSugerida) {
+                'VERDE' { 'V'; break }
+                'AMBAR' { 'A'; break }
+                'AZUL' { 'Z'; break }
+                'VERMELHO' { 'R'; break }
+                'APAGADO' { 'O'; break }
+                default {
+                    throw "Cor de LED desconhecida recebida do backend: '$($response.corLedSugerida)'"
+                }
             }
-            $serial.WriteLine(($command | ConvertTo-Json -Compress))
+            $serial.WriteLine($command)
             Write-Host (
-                '[OK] {0}: LDR={1}, botão={2} -> alerta={3}, instrucaoLed={4}, modo={5}' -f
+                '[OK] {0}: LDR={1}, botão={2} -> comando={3}, modo={4}' -f
                 $payload.codigoTorre,
                 $brightness,
                 $payload.pressaoBotaoCerracao,
-                $response.alertaAtivado,
-                $response.instrucaoLed,
+                $command,
                 $response.modoLuz
             )
         }

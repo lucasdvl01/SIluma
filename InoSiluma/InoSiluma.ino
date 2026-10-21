@@ -13,6 +13,9 @@ float nivelBateria = 92.5;
 bool ledLigado = false;
 unsigned long ultimaTelemetria = 0;
 const unsigned long intervaloTelemetria = 3000;
+char bufferComando[8];
+size_t tamanhoComando = 0;
+bool descartandoComando = false;
 
 void setup() {
   Serial.begin(115200);
@@ -60,36 +63,57 @@ void loop() {
 
 void processarComandosDoBackend() {
   while (Serial.available() > 0) {
-    String linha = Serial.readStringUntil('\n');
-    linha.trim();
-
-    if (!linha.startsWith("{")) {
+    char caractere = static_cast<char>(Serial.read());
+    if (caractere == '\r') {
       continue;
     }
 
-    StaticJsonDocument<96> resposta;
-    DeserializationError erro = deserializeJson(resposta, linha);
-    if (erro) {
-      Serial.print(F("[ERRO] Comando JSON invalido: "));
-      Serial.println(erro.c_str());
+    if (caractere != '\n') {
+      if (descartandoComando) {
+        continue;
+      }
+      if (tamanhoComando >= sizeof(bufferComando) - 1) {
+        tamanhoComando = 0;
+        descartandoComando = true;
+        continue;
+      }
+      bufferComando[tamanhoComando++] = caractere;
       continue;
     }
 
-    bool alertaAtivado = resposta["alertaAtivado"] | false;
-    ledLigado = resposta["instrucaoLed"] | false;
+    if (descartandoComando) {
+      descartandoComando = false;
+      tamanhoComando = 0;
+      Serial.println(F("[ERRO] Comando serial excedeu o limite"));
+      continue;
+    }
 
-    Serial.print(F("[COMANDO RECEBIDO] alerta="));
-    Serial.print(alertaAtivado ? F("true") : F("false"));
-    Serial.print(F(", instrucaoLed="));
-    Serial.println(ledLigado ? F("true") : F("false"));
+    if (tamanhoComando != 1) {
+      tamanhoComando = 0;
+      Serial.println(F("[ERRO] Comando serial desconhecido"));
+      continue;
+    }
 
-    if (alertaAtivado) {
+    char comando = bufferComando[0];
+    tamanhoComando = 0;
+    ledLigado = comando != 'O';
+
+    if (comando == 'R') {
+      atualizarLeds(true, false, false);
+    } else if (comando == 'A' || comando == 'Z') {
       atualizarLeds(false, false, true);
-    } else if (ledLigado) {
+    } else if (comando == 'V') {
       atualizarLeds(false, true, false);
-    } else {
+    } else if (comando == 'O') {
       atualizarLeds(false, false, false);
+    } else {
+      ledLigado = false;
+      Serial.println(F("[ERRO] Codigo de comando serial invalido"));
+      continue;
     }
+
+    Serial.print(F("[COMANDO RECEBIDO] codigo="));
+    Serial.println(comando);
   }
 }
 

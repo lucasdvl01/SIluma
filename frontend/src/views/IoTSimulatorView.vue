@@ -300,8 +300,8 @@ const autoLoop = ref(false);
 const transmitting = ref(false);
 
 const ledOn = ref(true);
-const ledModo = ref('NORMAL');
 const ledPwmValue = ref(200);
+const ledColor = ref('VERDE');
 
 const terminalLogs = ref([]);
 
@@ -309,15 +309,17 @@ let autoTimer = null;
 
 const ledColorHex = computed(() => {
   if (!ledOn.value) return '#475569';
-  if (ledModo.value === 'ALTA_VISIBILIDADE_CERRACAO') return '#f59e0b'; // Âmbar
-  if (ledModo.value === 'ECONOMIA') return '#38bdf8'; // Azul
+  if (ledColor.value === 'VERMELHO') return '#ef4444';
+  if (ledColor.value === 'AMBAR') return '#f59e0b';
+  if (ledColor.value === 'AZUL') return '#38bdf8';
   return '#10b981'; // Verde operacional
 });
 
 const ledStatusTitle = computed(() => {
   if (!ledOn.value) return 'Luminária Apagada (Desligada)';
-  if (ledModo.value === 'ALTA_VISIBILIDADE_CERRACAO') return 'Alta Visibilidade Cerração (Âmbar 100%)';
-  if (ledModo.value === 'ECONOMIA') return 'Modo Econômico de Operação (Azul 50%)';
+  if (ledColor.value === 'VERMELHO') return 'Falha técnica ou manutenção (Vermelho)';
+  if (ledColor.value === 'AMBAR') return 'Alta Visibilidade Cerração (Âmbar 100%)';
+  if (ledColor.value === 'AZUL') return 'Modo Econômico de Operação (Azul 50%)';
   return 'Modo Normal Operacional (Verde 80%)';
 });
 
@@ -344,8 +346,8 @@ const sendTelemetry = async () => {
     const data = res.data;
 
     ledOn.value = data.instrucaoLed;
-    ledModo.value = data.modoLuz;
     ledPwmValue.value = data.intensidadePwm;
+    ledColor.value = data.corLedSugerida || (data.instrucaoLed ? 'VERDE' : 'APAGADO');
 
     if (data.alertaAtivado) {
       addLog(`< 200 OK: ALERTA [${data.mensagem}]`, 'alert');

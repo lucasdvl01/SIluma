@@ -59,8 +59,8 @@ limiar de 300 conforme a iluminação e os componentes da montagem.
 ### O que o firmware Mega demonstra e o que não demonstra
 
 - O teste inicial acende verde, amarelo e vermelho em sequência; durante o laço,
-  verde indica operação normal e amarelo indica alerta. Vermelho não é usado
-  como sinalização contínua de inicialização depois do teste.
+  verde indica operação normal, amarelo indica alerta de baixa visibilidade e
+  vermelho indica falha técnica ou manutenção.
 - A cada 3 segundos, o sketch imprime uma linha JSON no Monitor Serial a
   115200 baud. A ponte ignora as mensagens do teste inicial e encaminha os
   objetos JSON ao backend.
@@ -78,11 +78,17 @@ limiar de 300 conforme a iluminação e os componentes da montagem.
   Troque `COM6` pela porta exibida no Gerenciador de Dispositivos. O backend
   deve estar ativo na mesma máquina em `127.0.0.1:8080`. Pressione `Ctrl+C`
   para encerrar a ponte e liberar a porta.
-- O sketch processa as respostas do backend: amarelo para alerta, verde para
-  luminária ligada sem alerta e LEDs apagados quando a resposta manda desligar.
-  A ponte envia pela serial apenas os campos booleanos usados pelo Mega, evitando
-  payloads desnecessários; o sketch registra os comandos recebidos para facilitar
-  o diagnóstico. O LED vermelho é usado apenas no teste de inicialização.
+- O sketch processa a cor sugerida pelo backend: amarelo para alerta de baixa
+  visibilidade, verde para operação normal, vermelho para falha/manutenção e
+  LEDs apagados quando a torre está desligada. A ponte envia o comando de volta
+  como um caractere por linha (`A`, `V`, `R`, `Z` ou `O`), evitando interpretar
+  JSON na recepção da placa. Os comandos de ligar/desligar feitos na interface
+  chegam à placa na próxima telemetria (até cerca de 3 segundos).
+- Falha/manutenção tem prioridade e mantém o vermelho aceso. Fora desses casos,
+  desligar a torre apaga os LEDs mesmo se o LDR detectar baixa visibilidade;
+  ligada, a torre usa amarelo para esse alerta.
+- A montagem Mega não tem LED azul; por isso, o modo econômico é representado
+  pelo LED amarelo. Os LEDs são indicadores e não acionam uma luminária real.
 - `nivelBateria = 92.5` é um valor fixo demonstrativo; o circuito não mede
   bateria. O LED amarelo/vermelho/verde também não comuta uma luminária real.
 - O Mega envia em `statusLed` o último comando recebido; a ponte envia ao
@@ -249,6 +255,9 @@ necessariamente o mesmo endereço a usar com a placa física.
 | Baixa luminosidade | Cobrir o LDR e obter leitura abaixo de 300 | Backend marca alerta de baixa visibilidade; LED fica âmbar |
 | Botão manual | Pressionar brevemente o botão de GPIO 14 | Telemetria indica `pressaoBotaoCerracao: true`; alerta/LED âmbar |
 | Recuperação | Descobrir o LDR e voltar a leitura para 300 ou mais | Backend pode restaurar o estado normal da torre |
+| Desligamento remoto | Desligar `TR-001` pela interface com a ponte ativa | Na próxima telemetria, todos os LEDs ficam apagados |
+| Religamento remoto | Ligar `TR-001` pela interface com a ponte ativa | Na próxima telemetria, o LED volta a indicar o modo atual |
+| Falha/manutenção | Colocar a torre em falha técnica ou abrir uma ordem de manutenção | LED vermelho permanece aceso |
 | Perda de Wi-Fi | Desconectar a rede e cobrir o LDR | Fallback local acende âmbar; serial informa que a rede está indisponível |
 | Reconexão | Restaurar Wi-Fi | ESP32 volta a enviar telemetria ao backend |
 
