@@ -1,14 +1,14 @@
-# Extensão IoT - Simulação e Integração com Arduino / ESP32
+# Extensão IoT — Simulação e integração com Arduino Mega
 **Projeto:** Sistema de Gestão e Monitoramento de Iluminação Inteligente para Minas  
 **Instituição:** SENAI Betim (CETEM Maria Madalena Nogueira)  
 **Requisitos Atendidos:** RF06, RNF-C10, Item 9 do Documento Oficial do SENAI
 
 Para a lista de materiais, pinagem, segurança e checklist de testes, consulte o
-[Guia de montagem dos circuitos IoT](../docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md),
-que também documenta a variante já montada com Arduino Mega 2560. Essa placa
-transmite JSON pela serial USB; o script `serial_http_bridge.ps1` encaminha os
-dados ao backend local e retorna o comando para os LEDs. Feche o Monitor Serial
-antes de iniciar a ponte, pois ela precisa abrir a mesma porta COM.
+[Guia do circuito Arduino Mega](../docs/GUIA_MONTAGEM_ARDUINO_MEGA_SI_LUMA.md).
+O Mega transmite JSON pela serial USB; o script
+`serial_http_bridge.ps1` encaminha os dados ao backend local e retorna o comando
+para os LEDs. Feche o Monitor Serial antes de iniciar a ponte, pois ela precisa
+abrir a mesma porta COM.
 
 ---
 
@@ -16,18 +16,21 @@ antes de iniciar a ponte, pois ela precisa abrir a mesma porta COM.
 
 O subsistema IoT simula uma **Torre de Iluminação Móvel Inteligente** operando em campo nas frentes de lavra e estradas da mina.
 
-O dispositivo monitora as condições ambientais (queda de luminosidade provocada por cerração, neblina ou período noturno) através do sensor LDR ou de um botão manual de cerração. Ao detectar baixa luminosidade, o firmware envia uma requisição `POST /api/iot/telemetry` para o backend Spring Boot. O backend analisa o evento, altera o status da torre para **"Alerta de Baixa Visibilidade"** e responde com a instrução de acionamento imediato do LED RGB na cor de alta visibilidade (Âmbar/Amarelo).
+No circuito físico, o Arduino Mega lê o LDR e o botão. A ponte no computador
+encaminha a telemetria ao backend Spring Boot, que analisa o evento, atualiza o
+estado da torre e retorna à ponte a cor sugerida para os LEDs discretos. Os
+simuladores Web e Node.js permitem testar esse fluxo sem a placa.
 
 ---
 
 ## 2. Opções de Execução
 
-Você pode testar a integração IoT de **4 formas diferentes**:
+Você pode testar a integração IoT de **3 formas diferentes**:
 
 ### Opção A: Simulador Web Integrado no Frontend (Mais Fácil)
 1. Acesse o sistema web no navegador.
-2. No menu lateral, clique em **"Simulador IoT"**.
-3. Você verá uma bancada virtual completa com a placa ESP32, slider do sensor LDR, botão de cerração, medidor de bateria e o LED RGB respondendo instantaneamente em tempo real à API REST!
+2. No menu lateral, clique em **"Bancada IoT (Simulador)"**.
+3. A bancada virtual permite variar o LDR, acionar o botão, ajustar a bateria demonstrativa e observar a resposta da API sem hardware conectado.
 
 ---
 
@@ -40,24 +43,7 @@ O script transmitirá dados para o backend a cada 2.5 segundos e exibirá as res
 
 ---
 
-### Opção C: Simulador Wokwi (Navegador com ESP32 Virtual) ou Hardware Físico
-#### 1. Pinagem no ESP32:
-| Componente | Pino no ESP32 | Descrição |
-| :--- | :--- | :--- |
-| **Sensor LDR (AO)** | `GPIO 34` | Entrada analógica ADC1 para medição de luz |
-| **Botão Cerração** | `GPIO 14` | Entrada digital com resistor Pull-Up interno |
-| **LED RGB - Vermelho** | `GPIO 25` | Canal PWM para controle de intensidade |
-| **LED RGB - Verde** | `GPIO 26` | Canal PWM |
-| **LED RGB - Azul** | `GPIO 27` | Canal PWM |
-| **Alimentação LDR/LED** | `3V3` e `GND` | Alimentação lógica 3.3V |
-
-#### 2. Executando no Wokwi:
-1. Acesse [https://wokwi.com](https://wokwi.com) e crie um novo projeto **ESP32**.
-2. Copie o conteúdo de `iot-simulator/arduino_esp32_firmware.ino` para a aba de código (`sketch.ino`).
-3. Copie o conteúdo de `iot-simulator/wokwi_diagram.json` para a aba `diagram.json`.
-4. Inicie a simulação no Wokwi!
-
-### Opção D: Arduino Mega 2560 conectado por USB
+### Opção C: Arduino Mega 2560 conectado por USB
 1. Grave `InoSiluma/InoSiluma.ino` na placa e confirme a porta COM no Gerenciador
    de Dispositivos.
 2. Inicie o backend local na porta 8080.
@@ -73,7 +59,7 @@ O script transmitirá dados para o backend a cada 2.5 segundos e exibirá as res
 
 ## 3. Especificação do Payload JSON (RF06)
 
-### Requisição do Dispositivo para o Backend:
+### Telemetria enviada pela ponte ao backend:
 - **Método:** `POST`
 - **URL:** `http://localhost:8080/api/iot/telemetry`
 - **Headers:** `Content-Type: application/json`
@@ -88,7 +74,7 @@ O script transmitirá dados para o backend a cada 2.5 segundos e exibirá as res
 }
 ```
 
-### Resposta do Backend para o Dispositivo:
+### Resposta do backend para a ponte:
 - **Código:** `200 OK`
 - **Payload:**
 ```json
@@ -97,8 +83,12 @@ O script transmitirá dados para o backend a cada 2.5 segundos e exibirá as res
   "instrucaoLed": true,
   "modoLuz": "ALTA_VISIBILIDADE_CERRACAO",
   "intensidadePwm": 255,
+  "corLedSugerida": "AMBAR",
   "alertaAtivado": true,
   "mensagem": "Alerta de Baixa Visibilidade! Instrução IoT: Ligar LED em potência máxima (Cerração).",
   "horarioServidor": "2026-10-16T10:45:00"
 }
 ```
+Na serial, a ponte converte `corLedSugerida` em um caractere por linha: `V`
+(verde), `A` (amarelo), `R` (vermelho), `Z` (modo econômico, representado por
+amarelo na montagem) ou `O` (apagado).

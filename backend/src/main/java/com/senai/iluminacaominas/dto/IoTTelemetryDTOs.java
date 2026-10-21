@@ -34,7 +34,7 @@ public class IoTTelemetryDTOs {
         private String codigoTorre;
         private boolean instrucaoLed; // true = acender / manter aceso
         private String modoLuz;
-        private int intensidadePwm; // 0 a 255 para controle PWM no ESP32/Arduino
+        private int intensidadePwm; // Intensidade lógica sugerida pelo backend (0 a 255)
         private String corLedSugerida;
         private boolean alertaAtivado;
         private String mensagem;

@@ -107,7 +107,7 @@
           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
       >
         <Cpu class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/simulador-iot' ? 'text-amber-700' : 'text-slate-500'" />
-        <span>Bancada IoT (ESP32)</span>
+        <span>Bancada IoT (Simulador)</span>
       </router-link>
 
       <router-link

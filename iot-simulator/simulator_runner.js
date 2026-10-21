@@ -1,6 +1,6 @@
 /**
  * =====================================================================================
- * SIMULADOR STANDALONE DE DISPOSITIVOS IOT (ARDUINO/ESP32)
+ * SIMULADOR STANDALONE DE TELEMETRIA IOT
  * Projeto: Iluminação Inteligente para Minas - SENAI Betim
  * =====================================================================================
  * Este script em Node.js simula em tempo real múltiplas torres de iluminação enviando
@@ -18,7 +18,7 @@ const API_PORT = process.env.API_PORT || 8080;
 const API_PATH = '/api/iot/telemetry';
 
 console.log('===========================================================');
-console.log('  SIMULADOR DE HARDWARE IOT (ESP32 / SENAI BETIM)          ');
+console.log('  SIMULADOR DE TELEMETRIA IOT (SENAI BETIM)                ');
 console.log('===========================================================');
 console.log(`Conectando em http://${API_HOST}:${API_PORT}${API_PATH}\n`);
 

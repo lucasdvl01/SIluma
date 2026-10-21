@@ -11,11 +11,11 @@
             Bancada de Diagnóstico & Telemetria IoT
           </h1>
           <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-xl bg-slate-900 text-slate-300 border border-white/10">
-            Hardware ESP32
+            Simulador virtual
           </span>
         </div>
         <p class="mt-2">
-          Ensaio e validação do microcontrolador ESP32 / Arduino em comunicação direta com a API Spring Boot via HTTP REST
+          Simulação de sensores e validação das respostas da API Spring Boot, sem conexão ao circuito físico
         </p>
       </div>
 
@@ -41,8 +41,8 @@
               <Cpu class="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h3 class="text-sm font-semibold text-slate-100">Dispositivo de Campo: ESP32 DevKit v1</h3>
-              <p class="text-[11px] font-mono text-slate-400">ADC 10-bit • GPIO 34 (LDR) • GPIO 14 (Botão) • GPIO 25/26/27 (RGB)</p>
+              <h3 class="text-sm font-semibold text-slate-100">Entradas virtuais do simulador</h3>
+              <p class="text-[11px] font-mono text-slate-400">LDR • botão de cerração • bateria demonstrativa</p>
             </div>
           </div>
           <span class="text-[11px] font-mono font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded">
@@ -72,7 +72,7 @@
             <div>
               <div class="flex items-center gap-2">
                 <Sun class="w-3.5 h-3.5 text-amber-400" />
-                <span class="text-xs font-semibold text-slate-200">Sensor Fotoelétrico LDR (GPIO 34 / ADC)</span>
+                <span class="text-xs font-semibold text-slate-200">Sensor fotoelétrico LDR (simulado)</span>
                 <span
                   class="text-[10px] font-mono px-2 py-0.5 rounded uppercase font-semibold"
                   :class="ldrValue < 300 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'"
@@ -125,7 +125,7 @@
           </div>
         </div>
 
-        <!-- Botão Físico de Cerração (GPIO 14) & Bateria -->
+        <!-- Botão virtual de cerração e bateria demonstrativa -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Entrada Digital Cerração -->
           <div class="p-4 bg-slate-950 border border-slate-800 rounded space-y-3 flex flex-col justify-between">
@@ -134,7 +134,7 @@
                 <AlertTriangle class="w-3.5 h-3.5 text-amber-400" />
                 <span class="text-xs font-semibold text-slate-200">Botão de Emergência Cerração</span>
               </div>
-              <p class="text-[11px] text-slate-400 mt-1">Interrupção por hardware no pino digital GPIO 14</p>
+              <p class="text-[11px] text-slate-400 mt-1">Entrada virtual enviada à API junto com a telemetria</p>
             </div>
             <button
               @click="triggerFogButton"
@@ -144,7 +144,7 @@
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 active:bg-amber-600'"
             >
               <Power class="w-3.5 h-3.5" />
-              <span>{{ fogButtonPressed ? 'SINAL GPIO 14 ATIVO' : 'Pressionar Pulso Cerração' }}</span>
+              <span>{{ fogButtonPressed ? 'BOTÃO VIRTUAL ATIVO' : 'Pressionar Pulso Cerração' }}</span>
             </button>
           </div>
 
@@ -153,7 +153,7 @@
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-1.5">
                 <Battery class="w-3.5 h-3.5 text-emerald-400" />
-                <span class="text-xs font-semibold text-slate-200">Carga da Bateria (Banco 24V)</span>
+                <span class="text-xs font-semibold text-slate-200">Bateria demonstrativa (não medida)</span>
               </div>
               <span class="text-xs font-mono font-bold text-emerald-400">{{ batteryLevel }}%</span>
             </div>
@@ -202,7 +202,7 @@
             <div class="flex items-center gap-2">
               <Zap class="w-4 h-4 text-amber-400" />
               <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                Atuador: Luminária LED RGB (GPIO 25, 26, 27)
+                Indicador virtual de estado
               </h4>
             </div>
             <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">

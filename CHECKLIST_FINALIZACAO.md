@@ -2,7 +2,7 @@
 
 Este documento registra o estado conhecido do projeto em **21/10/2026** e organiza o trabalho restante para concluir, testar e entregar o Sistema de Gestão e Monitoramento de Iluminação Inteligente para Minas.
 
-> **Importante:** “build passou” e “testes passaram” não significam que todos os requisitos foram certificados. A montagem física com Arduino Mega e a integração serial com o backend foram demonstradas; o teste do botão, a revisão visual final do mapa e outros requisitos ainda precisam ser confirmados.
+> **Importante:** “build passou” e “testes passaram” não significam que todos os requisitos foram certificados. A montagem física com Arduino Mega e a integração serial com o backend foram demonstradas; ainda há fluxos do sistema e aspectos visuais a validar.
 
 ## Como retomar
 
@@ -25,11 +25,12 @@ Este documento registra o estado conhecido do projeto em **21/10/2026** e organi
 - [x] Backend local validado com login ADMIN e consultas autenticadas somente de leitura via IPv4: torres (8), setores (4), estatísticas do dashboard, manutenções (4) e auditoria (50). OpenAPI respondeu HTTP 200. Nenhuma operação de escrita foi feita.
 - [x] Em 21/10/2026, Arduino Mega 2560 em COM6 foi compilado e gravado; o LDR variou de ~830 (claro) para ~22 (coberto), a ponte serial enviou telemetria de `TR-001` ao backend, o alerta foi confirmado e o usuário observou o LED laranja no escuro e verde ao clarear. O backend registrou evento `ALERTA_IOT_LDR`; nível de bateria continua simulado.
 - [x] O botão físico de cerração também foi testado pelo usuário: LED laranja pressionado e recuperação para verde após soltar.
-- [x] Corrigida a comunicação serial de retorno: a ponte envia ao Mega somente os booleanos `alertaAtivado` e `instrucaoLed`; sketch recompilado/gravado e o usuário confirmou que o teste voltou a funcionar. O firmware também registra o comando recebido para diagnóstico.
+- [x] Corrigida a comunicação serial de retorno: a ponte envia ao Mega um caractere por comando (`V`, `A`, `R`, `Z` ou `O`) e o usuário confirmou o funcionamento sem erros JSON.
 - [ ] O smoke test visual anterior usou respostas HTTP simuladas; a validação direta do backend não substitui percorrer os fluxos da interface ligados à API real. Repetir o smoke test integrado com backend antes da entrega.
 - [x] O terminal de operador foi ajustado para acompanhar o tema claro; o build do frontend passou após essa alteração.
 - [x] Redesign e documentação revisados, commitados e publicados em `feature/frontend-vue` no commit `909d035`.
-- [x] Criado `docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md` com materiais, pinagem, ligações, segurança e roteiro de testes do protótipo físico; o README do simulador IoT aponta para o guia.
+- [x] Criado `docs/GUIA_MONTAGEM_ARDUINO_MEGA_SI_LUMA.md` com materiais, pinagem, ligações, segurança e roteiro de testes do protótipo físico.
+- [x] Removidos o firmware e o diagrama Wokwi do ESP32; README, manual, requisitos, casos de uso, diagrama de sequência, API e interface agora descrevem o Arduino Mega real ou identificam explicitamente o simulador virtual.
 - [x] Docker Compose foi validado e os serviços MySQL 8, backend Spring Boot e frontend Nginx foram construídos e iniciados.
 - [x] No teste Docker, MySQL ficou saudável, o backend conectou ao MySQL, criou as tabelas e carregou os dados iniciais. Foram observados 2 usuários, 4 setores, 7 torres, 2 ordens de manutenção e nenhuma telemetria.
 - [x] Login Admin e Operador, endpoints principais, proxy do frontend, mapa, manutenção, dashboard e polling IoT foram exercitados no ambiente Docker.
@@ -48,7 +49,7 @@ Este documento registra o estado conhecido do projeto em **21/10/2026** e organi
   - [ ] Executar o arquivo e confirmar que o backend inicia na porta 8080 antes do frontend.
   - [ ] Confirmar que o script não anuncia sucesso nem inicia o frontend se a API não ficar disponível no tempo limite.
   - [ ] Confirmar que a limpeza de `backend/target` não apaga `backend/h2_data`.
-- [x] Rodar testes do backend e build do frontend após as alterações: 8 testes passaram usando H2 em memória para não disputar o arquivo H2 da instância local ativa; `npm run build` passou. Repetir a execução limpa antes da entrega final, quando não houver backend local usando o H2.
+- [x] Validação final das alterações de remoção do ESP: 10 testes do backend passaram com H2 em memória isolado; build de produção do frontend passou; sintaxe da ponte PowerShell e `git diff --check` passaram.
 - [x] Conferir `git status` e `git diff --check`; os PDFs, os arquivos `.traineddata` e o SVG original foram mantidos fora do commit.
 - [x] Commitar apenas os arquivos pretendidos e enviar para `origin/feature/frontend-vue` (`909d035`).
 - [ ] Abrir um Pull Request de `feature/frontend-vue` para `develop` e registrar os resultados. Não há PR aberto; a criação deve ser concluída em [comparar branches no GitHub](https://github.com/lucasdvl01/SIluma/compare/develop...feature/frontend-vue?expand=1).
@@ -66,34 +67,16 @@ git diff --cached
 
 Adicione arquivos explicitamente com `git add -- caminho\do\arquivo`; evite `git add .` enquanto o PDF estiver não rastreado.
 
-## Fase 2 — Validar o protótipo e decidir sobre ESP32
+## Fase 2 — Validar o protótipo Arduino Mega
 
 A montagem já realizada usa Arduino Mega 2560 sem Wi-Fi e comunica-se com o backend pela ponte USB/HTTP. LDR e botão foram testados ponta a ponta; alerta acende o LED laranja e a recuperação retorna ao verde. A ponte ocupa a porta COM enquanto está ativa; o Monitor Serial deve permanecer fechado.
 
-Um ESP32 é uma expansão opcional se o objetivo passar a ser enviar dados por Wi-Fi sem depender do computador. O firmware está em `iot-simulator/arduino_esp32_firmware.ino`; a pinagem e os testes estão em `iot-simulator/README.md` e no [Guia de montagem IoT SI Luma](docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md).
-
-- [ ] Separar e confirmar os componentes do guia: ESP32 DevKit V1, cabo USB de dados, protoboard, jumpers, módulo LDR analógico (ou LDR + resistor de 10 kΩ), botão normalmente aberto, LED RGB de cátodo comum e três resistores de 220 Ω.
-- [ ] Montar primeiro um circuito de **baixa tensão**, com alimentação e ligação dos GPIOs conferidas no datasheet dos componentes. Não ligar GPIO do ESP32 diretamente à rede elétrica nem exceder 3,3 V nas entradas.
-- [ ] Conferir a pinagem proposta e validar a orientação do divisor de tensão caso use LDR avulso:
-  - LDR/saída analógica: GPIO 34 (ADC1).
-  - Botão de cerração: GPIO 14, com `INPUT_PULLUP`.
-  - LED RGB de cátodo comum: GPIOs 25, 26 e 27, cada canal em série com resistor de 220 Ω; verificar a ordem física dos terminais do LED.
-- [ ] Configurar no firmware o SSID/senha reais e o endereço IP da máquina que executa o backend. O endereço atual `10.0.2.2` é apenas um valor voltado a certos ambientes de simulação; não presumir que seja o IP correto da rede física.
-- [ ] Confirmar que computador e ESP32 estão na mesma rede e que o firewall permite acesso ao backend na porta 8080.
-- [ ] Verificar a versão do core ESP32 e da biblioteca ArduinoJson na IDE escolhida. O firmware usa chamadas PWM `ledcSetup`/`ledcAttachPin`; confirmar se a versão instalada as suporta ou adaptar à API dessa versão antes de gravar a placa.
-- [ ] Compilar e gravar o firmware; registrar placa, versões, pinagem final e configurações necessárias sem publicar credenciais reais de Wi-Fi.
-- [ ] Testar sequencialmente:
-  - [ ] Inicialização e conexão Wi-Fi.
-  - [ ] Leitura do LDR em condição clara e escura; confirmar limiar `< 300`.
-  - [ ] Acionamento do botão e debounce.
-  - [ ] POST para `/api/iot/telemetry` e resposta do backend.
-  - [ ] Polling de `/api/iot/command/{codigoTorre}`.
-  - [ ] Cores/intensidade do LED para modo normal, cerração e desligado.
-  - [ ] Comportamento sem Wi-Fi (fallback local) e reconexão.
-  - [ ] Atualização coerente do status da torre no sistema web.
-- [ ] Observar que o nível de bateria do firmware é simulado (não há sensor no circuito atual) e que o firmware lê `intensidadePwm` da resposta, mas ainda não aplica proporcionalmente esse valor aos canais do LED.
+- [x] Confirmado o circuito: Arduino Mega 2560, LDR avulso com resistor de 10 kΩ, botão e LEDs discretos.
+- [x] Testados LDR claro/escuro, botão e retorno da API pela ponte serial.
+- [ ] Validar no circuito os comandos de ligar/desligar, falha/manutenção e os LEDs correspondentes após a atualização do protocolo serial.
+- [ ] Guardar evidências da demonstração (fotos do circuito, saída do terminal da ponte e telas/eventos do sistema).
 - [ ] Guardar evidências da demonstração (fotos do circuito, saída Serial Monitor e telas/eventos do sistema).
-- [ ] Manter o simulador Web, Wokwi e runner durante a fase de montagem; remover somente depois da validação e se realmente não forem mais necessários.
+- [x] Manter o simulador Web e o runner Node.js como ferramentas opcionais de teste da API; o circuito físico oficial de demonstração é o Arduino Mega.
 
 ## Fase 3 — Validar os requisitos e fechar lacunas
 
@@ -115,7 +98,7 @@ Use `docs/1_Documento_de_Requisitos.md` (RF01–RF13 e RNFs), `docs/2_Casos_de_U
 - [ ] Testar o fluxo local em uma cópia nova do repositório: Java 17, Node.js/npm, instalação de dependências frontend e `start-local.bat`.
 - [ ] Testar Docker em uma máquina/cópia limpa: `docker compose up --build -d`, aguardar MySQL saudável e confirmar login/API/frontend.
 - [ ] Conferir persistência depois de reiniciar containers e documentar backup/restauração do MySQL.
-- [ ] Atualizar README/manual com requisitos de instalação, comandos exatos, URLs, credenciais demonstrativas, configuração de Wi-Fi/firmware e limitações.
+- [ ] Atualizar README/manual com requisitos de instalação, comandos exatos, URLs, credenciais demonstrativas, firmware Mega/ponte USB e limitações.
 - [ ] Confirmar que segredos reais (Wi-Fi, tokens, senhas pessoais) não estão versionados; manter apenas credenciais claramente identificadas como demonstração.
 - [ ] Fazer revisão final do Pull Request e mesclar primeiro em `develop`, depois em `main`.
 - [ ] Criar uma tag/versão de entrega e registrar evidências/testes executados.
