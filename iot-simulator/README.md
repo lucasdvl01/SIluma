@@ -3,8 +3,12 @@
 **Instituição:** SENAI Betim (CETEM Maria Madalena Nogueira)  
 **Requisitos Atendidos:** RF06, RNF-C10, Item 9 do Documento Oficial do SENAI
 
-Para a lista de materiais, pinagem, segurança elétrica e checklist de montagem e
-testes do protótipo físico, consulte o [Guia de montagem do circuito ESP32](../docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md).
+Para a lista de materiais, pinagem, segurança e checklist de testes, consulte o
+[Guia de montagem dos circuitos IoT](../docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md),
+que também documenta a variante já montada com Arduino Mega 2560. Essa placa
+transmite JSON pela serial USB; o script `serial_http_bridge.ps1` encaminha os
+dados ao backend local e retorna o comando para os LEDs. Feche o Monitor Serial
+antes de iniciar a ponte, pois ela precisa abrir a mesma porta COM.
 
 ---
 
@@ -18,7 +22,7 @@ O dispositivo monitora as condições ambientais (queda de luminosidade provocad
 
 ## 2. Opções de Execução
 
-Você pode testar a integração IoT de **3 formas diferentes**:
+Você pode testar a integração IoT de **4 formas diferentes**:
 
 ### Opção A: Simulador Web Integrado no Frontend (Mais Fácil)
 1. Acesse o sistema web no navegador.
@@ -52,6 +56,18 @@ O script transmitirá dados para o backend a cada 2.5 segundos e exibirá as res
 2. Copie o conteúdo de `iot-simulator/arduino_esp32_firmware.ino` para a aba de código (`sketch.ino`).
 3. Copie o conteúdo de `iot-simulator/wokwi_diagram.json` para a aba `diagram.json`.
 4. Inicie a simulação no Wokwi!
+
+### Opção D: Arduino Mega 2560 conectado por USB
+1. Grave `InoSiluma/InoSiluma.ino` na placa e confirme a porta COM no Gerenciador
+   de Dispositivos.
+2. Inicie o backend local na porta 8080.
+3. Feche o Monitor Serial e execute na raiz do repositório:
+   ```powershell
+   .\iot-simulator\serial_http_bridge.ps1 -Port COM6
+   ```
+   Substitua `COM6` pela porta identificada no seu computador. A ponte envia
+   uma amostra a cada 3 segundos e registra no terminal a decisão do backend.
+   Pressione `Ctrl+C` para parar e liberar a porta serial.
 
 ---
 

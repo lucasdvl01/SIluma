@@ -1,8 +1,8 @@
 # Checklist de finalização do projeto
 
-Este documento registra o estado conhecido do projeto em **20/10/2026** e organiza o trabalho restante para concluir, testar e entregar o Sistema de Gestão e Monitoramento de Iluminação Inteligente para Minas.
+Este documento registra o estado conhecido do projeto em **21/10/2026** e organiza o trabalho restante para concluir, testar e entregar o Sistema de Gestão e Monitoramento de Iluminação Inteligente para Minas.
 
-> **Importante:** “build passou” e “testes passaram” não significam que todos os requisitos foram certificados. A integração com o circuito físico, alguns requisitos de operação e a revisão final de entrega ainda precisam ser demonstrados.
+> **Importante:** “build passou” e “testes passaram” não significam que todos os requisitos foram certificados. A montagem física com Arduino Mega e a integração serial com o backend foram demonstradas; o teste do botão, a revisão visual final do mapa e outros requisitos ainda precisam ser confirmados.
 
 ## Como retomar
 
@@ -15,7 +15,7 @@ Este documento registra o estado conhecido do projeto em **20/10/2026** e organi
 
 - [x] Repositório GitHub: `https://github.com/lucasdvl01/SIluma`.
 - [x] Branches publicadas: `main`, `develop`, `feature/backend-api`, `feature/frontend-vue`, `feature/iot-simulator` e `test/system-validation`.
-- [x] O último commit da branch `feature/frontend-vue` é `1af6591` (`fix: clean backend build before local startup`); o commit anterior, `a3370cb`, corrige o H2 e compacta os cartões de manutenção.
+- [x] O commit `1af6591` corrige a limpeza do build antes da inicialização local; `a3370cb` corrige o H2 e compacta os cartões de manutenção.
 - [x] Os 8 testes existentes do backend passaram em uma execução limpa (`mvnw clean test`).
 - [x] O build de produção do frontend passou (`npm run build`).
 - [x] Melhorias locais de UX/UI aplicadas: navegação móvel acessível, estados de carregamento/falha, estimativas ambientais identificadas, atualizações periódicas no dashboard, telas carregadas sob demanda, desconexão simulada distinguida da rede real e redesign visual consistente de navegação, cabeçalhos, painéis, formulários, tabelas e páginas de operação.
@@ -23,6 +23,8 @@ Este documento registra o estado conhecido do projeto em **20/10/2026** e organi
 - [x] Corrigido o layout do Mapa para dar mais altura à área geográfica e manter o painel da torre fora do recorte do canvas; painel limitado à área disponível e rolável em viewports menores.
 - [ ] Conferir visualmente o painel selecionado no mapa em desktop e celular após a correção. A tentativa desta sessão não conectou ao navegador integrado; o build passou, mas a apresentação visual final ainda precisa de confirmação.
 - [x] Backend local validado com login ADMIN e consultas autenticadas somente de leitura via IPv4: torres (8), setores (4), estatísticas do dashboard, manutenções (4) e auditoria (50). OpenAPI respondeu HTTP 200. Nenhuma operação de escrita foi feita.
+- [x] Em 21/10/2026, Arduino Mega 2560 em COM6 foi compilado e gravado; o LDR variou de ~830 (claro) para ~22 (coberto), a ponte serial enviou telemetria de `TR-001` ao backend, o alerta foi confirmado e o usuário observou o LED laranja no escuro e verde ao clarear. O backend registrou evento `ALERTA_IOT_LDR`; nível de bateria continua simulado.
+- [x] O botão físico de cerração também foi testado pelo usuário: LED laranja pressionado e recuperação para verde após soltar.
 - [ ] O smoke test visual anterior usou respostas HTTP simuladas; a validação direta do backend não substitui percorrer os fluxos da interface ligados à API real. Repetir o smoke test integrado com backend antes da entrega.
 - [x] O terminal de operador foi ajustado para acompanhar o tema claro; o build do frontend passou após essa alteração.
 - [x] Redesign e documentação revisados, commitados e publicados em `feature/frontend-vue` no commit `909d035`.
@@ -37,7 +39,7 @@ Este documento registra o estado conhecido do projeto em **20/10/2026** e organi
 - [x] `start-local.bat` executa a limpeza de build antes da inicialização do backend; essa alteração já está no commit publicado `1af6591`.
 - [ ] O PDF `proposta 1 web + arduino.docx.pdf` aparece como arquivo não rastreado no diretório. Ele foi compartilhado para consulta, não deve ser incluído por acidente nos commits.
 - [ ] Não há Pull Request aberto de `feature/frontend-vue` para `develop`.
-- [ ] O circuito físico ainda não foi montado/testado; nenhum teste desta validação prova funcionamento com um Arduino/ESP32 real.
+- [x] O protótipo físico Arduino Mega + LDR + LEDs foi testado com o backend pela ponte USB/HTTP `iot-simulator/serial_http_bridge.ps1`.
 
 ## Fase 1 — Consolidar as correções locais e o Git
 
@@ -63,9 +65,11 @@ git diff --cached
 
 Adicione arquivos explicitamente com `git add -- caminho\do\arquivo`; evite `git add .` enquanto o PDF estiver não rastreado.
 
-## Fase 2 — Montar e validar o circuito ESP32
+## Fase 2 — Validar o protótipo e decidir sobre ESP32
 
-O item IoT aparece na proposta como **opcional/diferencial**, mas pode render pontos extras. O firmware preparado está em `iot-simulator/arduino_esp32_firmware.ino`; a pinagem e os testes estão em `iot-simulator/README.md` e no [Guia de montagem do circuito ESP32 SI Luma](docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md).
+A montagem já realizada usa Arduino Mega 2560 sem Wi-Fi e comunica-se com o backend pela ponte USB/HTTP. LDR e botão foram testados ponta a ponta; alerta acende o LED laranja e a recuperação retorna ao verde. A ponte ocupa a porta COM enquanto está ativa; o Monitor Serial deve permanecer fechado.
+
+Um ESP32 é uma expansão opcional se o objetivo passar a ser enviar dados por Wi-Fi sem depender do computador. O firmware está em `iot-simulator/arduino_esp32_firmware.ino`; a pinagem e os testes estão em `iot-simulator/README.md` e no [Guia de montagem IoT SI Luma](docs/GUIA_MONTAGEM_CIRCUITO_ESP32_SI_LUMA.md).
 
 - [ ] Separar e confirmar os componentes do guia: ESP32 DevKit V1, cabo USB de dados, protoboard, jumpers, módulo LDR analógico (ou LDR + resistor de 10 kΩ), botão normalmente aberto, LED RGB de cátodo comum e três resistores de 220 Ω.
 - [ ] Montar primeiro um circuito de **baixa tensão**, com alimentação e ligação dos GPIOs conferidas no datasheet dos componentes. Não ligar GPIO do ESP32 diretamente à rede elétrica nem exceder 3,3 V nas entradas.

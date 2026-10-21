@@ -1,12 +1,91 @@
 # Guia de montagem do circuito IoT — SI Luma
 
-Checklist de bancada para montar e testar a torre demonstrativa do SI Luma com ESP32.
-Este guia consolida a proposta do projeto, o diagrama Wokwi e o firmware atual em
-`iot-simulator/arduino_esp32_firmware.ino`.
+Checklist de bancada para montar e testar a torre demonstrativa do SI Luma. O
+projeto tem duas montagens diferentes: o circuito originalmente planejado com
+ESP32 e a montagem alternativa já realizada com Arduino Mega 2560, que transmite
+telemetria pela serial USB.
 
-> **Escopo seguro da demonstração:** o circuito usa um LED RGB como indicador visual.
-> Ele não alimenta uma luminária real, não comuta cargas de potência e não mede um
-> banco de baterias de 24 V.
+> **Escopo seguro da demonstração:** LEDs são apenas indicadores visuais. Nenhuma
+> montagem deste guia alimenta uma luminária real, comuta cargas de potência ou
+> mede um banco de baterias de 24 V.
+
+> **Montagem realizada:** Arduino Mega 2560, LDR avulso no divisor resistivo em
+> A7, botão no pino digital 3 e três LEDs separados nos pinos 47, 49 e 51.
+> Essa variante não tem Wi-Fi: o firmware descrito pelo usuário imprime JSON no
+> Monitor Serial, mas não envia dados ao backend por conta própria. A montagem
+> ESP32 com Wi-Fi continua documentada nas seções seguintes.
+
+## Montagem realizada — Arduino Mega 2560
+
+Esta é a configuração da placa montada. Ela é apropriada para testar o sensor,
+o botão, os indicadores e a geração de dados seriais. Não requer módulo LDR:
+o LDR avulso e um resistor de 10 kΩ formam o divisor de tensão.
+
+### Materiais
+
+- Arduino Mega 2560 e cabo USB de dados.
+- Protoboard e jumpers macho-macho.
+- LDR avulso e resistor de 10 kΩ.
+- Botão push button normalmente aberto.
+- LED vermelho, LED verde e LED amarelo.
+- Um resistor de 220 Ω em série com cada LED.
+
+### Ligações
+
+| Componente | Pino/conexão no Mega | Observação |
+|---|---|---|
+| LDR, terminal 1 | 5V | Alimentação do divisor |
+| LDR, terminal 2 | A7 e terminal 1 do resistor de 10 kΩ | Nó de leitura analógica |
+| Resistor de 10 kΩ, terminal 2 | GND | Referência do divisor |
+| Botão, terminal 1 | Pino digital 3 | Entrada com `INPUT_PULLUP` |
+| Botão, terminal 2 | GND | Pressionado = `LOW` |
+| LED vermelho, ânodo | Pino digital 51, passando por resistor de 220 Ω | Indicador de inicialização/teste |
+| LED verde, ânodo | Pino digital 49, passando por resistor de 220 Ω | Indicação normal |
+| LED amarelo, ânodo | Pino digital 47, passando por resistor de 220 Ω | Indicação de alerta |
+| Cátodo de cada LED | GND | Terra comum |
+
+Confira a perna longa do LED (ânodo) e a perna curta (cátodo); a identificação
+física pode variar. Cada LED precisa do seu próprio resistor em série. Desligue
+o USB antes de alterar os fios. Nesta montagem Mega, o divisor é alimentado em
+5 V e conectado apenas à entrada analógica A7 do Mega; não reaproveite essa
+ligação em um ESP32, cujos GPIOs não toleram 5 V.
+
+O botão deve fechar contato entre o pino 3 e GND quando pressionado. O pull-up
+interno mantém a entrada em nível alto quando solto. O valor de A7 varia de
+0 a 1023; com LDR entre 5V e A7 e resistor de 10 kΩ entre A7 e GND, a leitura
+normalmente sobe com mais luz. Confirme isso no Monitor Serial e calibre o
+limiar de 300 conforme a iluminação e os componentes da montagem.
+
+### O que o firmware Mega demonstra e o que não demonstra
+
+- O teste inicial acende verde, amarelo e vermelho em sequência; durante o laço,
+  verde indica operação normal e amarelo indica alerta. Vermelho não é usado
+  como sinalização contínua de inicialização depois do teste.
+- A cada 3 segundos, o sketch imprime uma linha JSON no Monitor Serial a
+  115200 baud. A ponte ignora as mensagens do teste inicial e encaminha os
+  objetos JSON ao backend.
+- O Arduino Mega 2560 não tem Wi-Fi integrado. O `Serial.println` envia dados
+  somente pela USB ao computador. A ponte
+  `iot-simulator/serial_http_bridge.ps1` encaminha a telemetria ao endpoint
+  local e escreve a resposta do backend de volta pela mesma serial.
+- Para usar a ponte, grave `InoSiluma/InoSiluma.ino` no Mega, feche o Monitor
+  Serial e execute no PowerShell:
+
+  ```powershell
+  .\iot-simulator\serial_http_bridge.ps1 -Port COM6
+  ```
+
+  Troque `COM6` pela porta exibida no Gerenciador de Dispositivos. O backend
+  deve estar ativo na mesma máquina em `127.0.0.1:8080`. Pressione `Ctrl+C`
+  para encerrar a ponte e liberar a porta.
+- O sketch processa as respostas do backend: amarelo para alerta, verde para
+  luminária ligada sem alerta e LEDs apagados quando a resposta manda desligar.
+  O LED vermelho é usado apenas no teste de inicialização.
+- `nivelBateria = 92.5` é um valor fixo demonstrativo; o circuito não mede
+  bateria. O LED amarelo/vermelho/verde também não comuta uma luminária real.
+- O Mega envia em `statusLed` o último comando recebido; a ponte envia ao
+  backend os campos de luminosidade, botão e bateria simulada. O backend decide
+  o alerta com `pressaoBotaoCerracao` e `luminosidadeLdr`.
 
 ## 1. O que o circuito precisa demonstrar
 
