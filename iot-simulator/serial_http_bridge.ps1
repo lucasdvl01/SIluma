@@ -43,6 +43,11 @@ try {
             continue
         }
 
+        if ($line.StartsWith('[COMANDO RECEBIDO]') -or $line.StartsWith('[ERRO]')) {
+            Write-Host $line -ForegroundColor Cyan
+            continue
+        }
+
         if ($line.StartsWith('{')) {
             $jsonBuffer.Clear() | Out-Null
             $insideJson = $true
@@ -103,14 +108,18 @@ try {
                 -TimeoutSec 5 `
                 -ErrorAction Stop
 
-            $responseJson = $response | ConvertTo-Json -Compress
-            $serial.WriteLine($responseJson)
+            $command = [ordered]@{
+                alertaAtivado = [bool]$response.alertaAtivado
+                instrucaoLed = [bool]$response.instrucaoLed
+            }
+            $serial.WriteLine(($command | ConvertTo-Json -Compress))
             Write-Host (
-                '[OK] {0}: LDR={1}, botão={2} -> alerta={3}, modo={4}' -f
+                '[OK] {0}: LDR={1}, botão={2} -> alerta={3}, instrucaoLed={4}, modo={5}' -f
                 $payload.codigoTorre,
                 $brightness,
                 $payload.pressaoBotaoCerracao,
                 $response.alertaAtivado,
+                $response.instrucaoLed,
                 $response.modoLuz
             )
         }

@@ -16,6 +16,7 @@ const unsigned long intervaloTelemetria = 3000;
 
 void setup() {
   Serial.begin(115200);
+  Serial.setTimeout(100);
 
   // Configuração dos Pinos
   pinMode(pinoBotao, INPUT_PULLUP);
@@ -66,7 +67,7 @@ void processarComandosDoBackend() {
       continue;
     }
 
-    StaticJsonDocument<512> resposta;
+    StaticJsonDocument<96> resposta;
     DeserializationError erro = deserializeJson(resposta, linha);
     if (erro) {
       Serial.print(F("[ERRO] Comando JSON invalido: "));
@@ -76,6 +77,11 @@ void processarComandosDoBackend() {
 
     bool alertaAtivado = resposta["alertaAtivado"] | false;
     ledLigado = resposta["instrucaoLed"] | false;
+
+    Serial.print(F("[COMANDO RECEBIDO] alerta="));
+    Serial.print(alertaAtivado ? F("true") : F("false"));
+    Serial.print(F(", instrucaoLed="));
+    Serial.println(ledLigado ? F("true") : F("false"));
 
     if (alertaAtivado) {
       atualizarLeds(false, false, true);

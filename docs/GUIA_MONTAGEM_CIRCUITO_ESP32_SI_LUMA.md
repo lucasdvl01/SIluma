@@ -80,7 +80,9 @@ limiar de 300 conforme a iluminação e os componentes da montagem.
   para encerrar a ponte e liberar a porta.
 - O sketch processa as respostas do backend: amarelo para alerta, verde para
   luminária ligada sem alerta e LEDs apagados quando a resposta manda desligar.
-  O LED vermelho é usado apenas no teste de inicialização.
+  A ponte envia pela serial apenas os campos booleanos usados pelo Mega, evitando
+  payloads desnecessários; o sketch registra os comandos recebidos para facilitar
+  o diagnóstico. O LED vermelho é usado apenas no teste de inicialização.
 - `nivelBateria = 92.5` é um valor fixo demonstrativo; o circuito não mede
   bateria. O LED amarelo/vermelho/verde também não comuta uma luminária real.
 - O Mega envia em `statusLed` o último comando recebido; a ponte envia ao

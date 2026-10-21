@@ -25,6 +25,7 @@ Este documento registra o estado conhecido do projeto em **21/10/2026** e organi
 - [x] Backend local validado com login ADMIN e consultas autenticadas somente de leitura via IPv4: torres (8), setores (4), estatísticas do dashboard, manutenções (4) e auditoria (50). OpenAPI respondeu HTTP 200. Nenhuma operação de escrita foi feita.
 - [x] Em 21/10/2026, Arduino Mega 2560 em COM6 foi compilado e gravado; o LDR variou de ~830 (claro) para ~22 (coberto), a ponte serial enviou telemetria de `TR-001` ao backend, o alerta foi confirmado e o usuário observou o LED laranja no escuro e verde ao clarear. O backend registrou evento `ALERTA_IOT_LDR`; nível de bateria continua simulado.
 - [x] O botão físico de cerração também foi testado pelo usuário: LED laranja pressionado e recuperação para verde após soltar.
+- [x] Corrigida a comunicação serial de retorno: a ponte envia ao Mega somente os booleanos `alertaAtivado` e `instrucaoLed`; sketch recompilado/gravado e o usuário confirmou que o teste voltou a funcionar. O firmware também registra o comando recebido para diagnóstico.
 - [ ] O smoke test visual anterior usou respostas HTTP simuladas; a validação direta do backend não substitui percorrer os fluxos da interface ligados à API real. Repetir o smoke test integrado com backend antes da entrega.
 - [x] O terminal de operador foi ajustado para acompanhar o tema claro; o build do frontend passou após essa alteração.
 - [x] Redesign e documentação revisados, commitados e publicados em `feature/frontend-vue` no commit `909d035`.
