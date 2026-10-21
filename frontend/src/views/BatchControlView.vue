@@ -1,17 +1,18 @@
 <template>
   <div class="space-y-6 max-w-5xl mx-auto">
     <!-- Header -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-white/5">
+    <header class="page-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
       <div>
-        <h1 class="text-xl font-bold text-white tracking-tight font-sans">
+        <p class="page-eyebrow mb-2">Ações coordenadas</p>
+        <h1 class="font-sans">
           Ações Coletivas por Frente da Mina
         </h1>
-        <p class="text-xs text-slate-400 mt-0.5">
+        <p class="mt-2">
           Disparo simultâneo de comandos operacionais para setores inteiros da mina (ex: cerração coletiva em frentes de escoamento)
         </p>
       </div>
 
-      <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-mono text-slate-400">
+      <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/70 border border-white/10 text-xs font-mono text-slate-300">
         <span>{{ towerStore.sectors.length }} Frentes Mapeadas</span>
       </div>
     </header>

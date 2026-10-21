@@ -1,21 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
-import LoginView from '../views/LoginView.vue';
-import DashboardView from '../views/DashboardView.vue';
-import MapView from '../views/MapView.vue';
-import TowersView from '../views/TowersView.vue';
-import BatchControlView from '../views/BatchControlView.vue';
-import MaintenanceView from '../views/MaintenanceView.vue';
-import AuditView from '../views/AuditView.vue';
-import OperatorView from '../views/OperatorView.vue';
-import IoTSimulatorView from '../views/IoTSimulatorView.vue';
-
 const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: LoginView,
+    component: () => import('../views/LoginView.vue'),
     meta: { public: true }
   },
   {
@@ -28,49 +18,49 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: DashboardView,
+    component: () => import('../views/DashboardView.vue'),
     meta: { requiresAuth: true, adminOnly: true }
   },
   {
     path: '/mapa',
     name: 'Mapa',
-    component: MapView,
+    component: () => import('../views/MapView.vue'),
     meta: { requiresAuth: true, adminOnly: true }
   },
   {
     path: '/torres',
     name: 'Torres',
-    component: TowersView,
+    component: () => import('../views/TowersView.vue'),
     meta: { requiresAuth: true, adminOnly: true }
   },
   {
     path: '/lote',
     name: 'ComandosEmLote',
-    component: BatchControlView,
+    component: () => import('../views/BatchControlView.vue'),
     meta: { requiresAuth: true, adminOnly: true }
   },
   {
     path: '/manutencoes',
     name: 'Manutencoes',
-    component: MaintenanceView,
+    component: () => import('../views/MaintenanceView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/auditoria',
     name: 'Auditoria',
-    component: AuditView,
+    component: () => import('../views/AuditView.vue'),
     meta: { requiresAuth: true, adminOnly: true }
   },
   {
     path: '/operador',
     name: 'AppOperador',
-    component: OperatorView,
+    component: () => import('../views/OperatorView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/simulador-iot',
     name: 'SimuladorIoT',
-    component: IoTSimulatorView,
+    component: () => import('../views/IoTSimulatorView.vue'),
     meta: { requiresAuth: true }
   },
   {

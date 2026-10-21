@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/iot")
 @RequiredArgsConstructor
-@Tag(name = "IoT & Arduino (ESP32)", description = "Endpoints de integração com dispositivos físicos e simuladores (RF06, RNF-C10)")
+@Tag(name = "IoT & Arduino", description = "Endpoints de integração com o circuito Arduino Mega e simuladores (RF06, RNF-C10)")
 public class IoTController {
 
     private final IoTService ioTService;
 
     @PostMapping("/telemetry")
-    @Operation(summary = "Recebe payload JSON enviado por Arduino/ESP32 via HTTP POST (RF06)")
+    @Operation(summary = "Recebe telemetria encaminhada pelo circuito Arduino via HTTP POST (RF06)")
     public ResponseEntity<TelemetryResponseDTO> receiveTelemetry(
             @Valid @RequestBody TelemetryRequestDTO telemetryRequest,
             HttpServletRequest request) {

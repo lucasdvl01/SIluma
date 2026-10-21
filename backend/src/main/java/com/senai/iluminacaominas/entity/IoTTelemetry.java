@@ -22,7 +22,7 @@ public class IoTTelemetry {
     private String codigoTorre;
 
     @Column(nullable = false)
-    private Integer luminosidadeLdr; // Valor analógico 0-1023 (ou 0-4095 do ESP32 ou 0-100%)
+    private Integer luminosidadeLdr; // Valor analógico normalizado para 0-1023
 
     @Column(nullable = false)
     private Boolean statusLed; // se a luminária está ligada ou desligada
@@ -42,7 +42,7 @@ public class IoTTelemetry {
     private Boolean alertaGerado = false;
 
     @Column(length = 150)
-    private String comandoResposta; // Instrução enviada de volta ao Arduino/ESP32
+    private String comandoResposta; // Instrução enviada de volta ao circuito Arduino
 
     @PrePersist
     protected void onCreate() {

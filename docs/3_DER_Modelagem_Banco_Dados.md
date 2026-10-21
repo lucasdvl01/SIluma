@@ -147,7 +147,7 @@ Entidade central do sistema contendo telemetria, coordenadas, parâmetros operac
 - `horas_atividade_acumuladas` (DOUBLE, NOT NULL): Horímetro total acumulado.
 - `limite_horas_preventiva` (DOUBLE, NOT NULL): Limite de horas para a próxima manutenção (padrão 250h).
 - `alerta_baixa_visibilidade` (BOOLEAN, NOT NULL): Disparado por sensor LDR ou cerração.
-- `ultimo_contato_iot` (DATETIME): Data e hora da última telemetria do ESP32.
+- `ultimo_contato_iot` (DATETIME): Data e hora da última telemetria do dispositivo IoT.
 - `data_ultima_ativacao` (DATETIME): Horário em que a torre foi ligada pela última vez.
 - `data_cadastro` (DATETIME, NOT NULL): Registro da criação da torre.
 
@@ -181,7 +181,7 @@ Gestão dos chamados de falhas de campo e manutenções preventivas baseadas em 
 - `usuario_abertura` (VARCHAR(120)): Usuário que abriu o chamado.
 
 ### 2.6 Tabela `tb_telemetria_iot`
-Histórico de dados brutos enviados pelo microcontrolador ESP32/Arduino via requisição HTTP POST (RF06).
+Histórico de telemetria enviada pelo circuito Arduino por meio da ponte USB/HTTP (RF06).
 - `id` (BIGINT, PK, Auto Increment)
 - `codigo_torre` (VARCHAR(30), NOT NULL)
 - `luminosidade_ldr` (INT, NOT NULL): Leitura analógica (0 a 1023).
