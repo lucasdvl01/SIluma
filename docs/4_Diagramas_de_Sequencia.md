@@ -59,23 +59,25 @@ sequenceDiagram
 
 ---
 
-## 2. Diagrama de Sequência: Automação IoT por Sensor de Luminosidade (LDR / ESP32)
-Demonstra o fluxo automatizado da extensão IoT: o microcontrolador ESP32 detecta escuridão ou forte cerração na mina através do sensor LDR e envia telemetria ao backend, que altera o status da torre e responde com a instrução de acionamento do LED:
+## 2. Diagrama de Sequência: Automação IoT por Sensor de Luminosidade (Arduino Mega)
+Demonstra o fluxo do circuito demonstrativo: o Arduino Mega lê o LDR e o botão, e uma ponte no computador encaminha a telemetria ao backend e retorna o comando dos LEDs:
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Sensor as Sensor LDR (GPIO 34)
-    participant ESP32 as ESP32 / Arduino (Firmware / Simulador)
+    participant Sensor as Sensor LDR (A7)
+    participant Mega as Arduino Mega (Firmware)
+    participant Bridge as Ponte USB/HTTP (PowerShell)
     participant API as IoTController (/api/iot/telemetry)
     participant IoTService as IoTService
     participant TowerRepo as LightingTowerRepository
     participant TelemetryRepo as IoTTelemetryRepository
     participant Frontend as Frontend Web (Dashboard / Mapa)
-    participant LED as LED RGB da Luminária (GPIO 25, 26, 27)
+    participant LED as LEDs indicadores (pinos 47, 49, 51)
 
-    Sensor->>ESP32: Leitura analógica de luz (< 300 = escuridão/cerração)
-    ESP32->>API: HTTP POST { codigoTorre: "TR-001", luminosidadeLdr: 150, ... }
+    Sensor->>Mega: Leitura analógica de luz (< 300 = baixa visibilidade)
+    Mega->>Bridge: Telemetria JSON pela USB
+    Bridge->>API: HTTP POST { codigoTorre: "TR-001", luminosidadeLdr: 150, ... }
     API->>IoTService: processTelemetry(telemetryRequest, clientIp)
     
     IoTService->>TowerRepo: findByCodigoIdentificacao("TR-001")
@@ -88,9 +90,10 @@ sequenceDiagram
     IoTService->>TelemetryRepo: save(IoTTelemetry com histórico bruto)
     
     IoTService-->>API: TelemetryResponseDTO (instrucaoLed: true, modoLuz: CERRACAO, pwm: 255)
-    API-->>ESP32: HTTP 200 OK { instrucaoLed: true, modoLuz: "ALTA_VISIBILIDADE_CERRACAO", intensidadePwm: 255 }
+    API-->>Bridge: HTTP 200 OK com a cor sugerida
     
-    ESP32->>LED: ledcWrite(PWM_CH_RED, 255); ledcWrite(PWM_CH_GREEN, 140); (Cor Âmbar)
+    Bridge->>Mega: Caractere serial da cor (A, V, R, Z ou O)
+    Mega->>LED: Aciona o LED indicador correspondente
     
     Note over Frontend: Polling periódico (10s) detecta alteração
     Frontend->>API: GET /api/towers

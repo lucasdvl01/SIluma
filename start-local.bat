@@ -10,7 +10,7 @@ echo.
 set "ROOT_DIR=%~dp0"
 
 echo [1/2] Iniciando Backend Spring Boot (Java 17 / H2 DB Dev)...
-start "Backend Spring Boot - CCO Minas" /D "%ROOT_DIR%backend" cmd /k "mvnw.cmd spring-boot:run"
+start "Backend Spring Boot - CCO Minas" /D "%ROOT_DIR%backend" cmd /k "mvnw.cmd clean spring-boot:run"
 
 echo Aguardando inicialização completa do backend Spring Boot...
 set /a retries=0
@@ -22,6 +22,14 @@ if %ERRORLEVEL% NEQ 0 (
     if %retries% LSS 18 (
         goto wait_backend
     )
+)
+
+if %retries% GEQ 18 (
+    echo.
+    echo ERRO: O Backend Spring Boot nao iniciou na porta 8080.
+    echo Consulte a janela "Backend Spring Boot - CCO Minas" para ver o erro.
+    pause
+    exit /b 1
 )
 
 echo [2/2] Iniciando Frontend Vue 3 (Vite)...

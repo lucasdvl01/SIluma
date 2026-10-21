@@ -1,66 +1,62 @@
 <template>
-  <div class="min-h-screen bg-[#060a12] flex flex-col justify-center items-center p-4 selection:bg-amber-400 selection:text-slate-950 relative overflow-hidden">
+  <div class="login-page relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#f5f7fa] p-4 selection:bg-amber-200 selection:text-slate-950 sm:p-6">
     <!-- Efeito de iluminação de fundo (Atmospheric Radial Glow) -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-amber-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="pointer-events-none absolute left-1/2 top-1/4 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-400/10 blur-[120px]"></div>
 
     <!-- Container Principal do Login -->
-    <div class="w-full max-w-md tactile-panel rounded-2xl shadow-2xl p-8 space-y-6 relative z-10 border border-white/10">
+    <div class="login-card relative z-10 w-full max-w-md space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-xl sm:p-8">
       <!-- Cabeçalho Institucional -->
       <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-sm">
-              <Radio class="w-4 h-4" />
-            </div>
-            <span class="font-mono font-extrabold text-base tracking-wider uppercase text-white">MINAS<span class="text-amber-400">LUX</span></span>
-          </div>
-          <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 text-slate-300 border border-white/10 font-bold">
+        <div class="flex items-start justify-between gap-3">
+          <img src="/si-luma-logo.svg" alt="SI Luma — Sistema de iluminação" class="brand-logo h-auto w-44 max-w-[65%]" />
+          <span class="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 font-mono">
             SENAI Betim
           </span>
         </div>
 
         <div>
-          <h1 class="text-lg font-bold text-white tracking-tight font-sans">Centro de Controle Operacional</h1>
-          <p class="text-xs text-slate-400 mt-0.5">
+          <p class="page-eyebrow mb-2">Sistema integrado de iluminação</p>
+          <h1 class="font-sans text-xl font-bold tracking-tight text-slate-900">Centro de Controle Operacional</h1>
+          <p class="mt-2 text-sm leading-relaxed text-slate-600">
             Gestão e Monitoramento de Iluminação Móvel para Frentes de Lavra
           </p>
         </div>
       </div>
 
       <!-- Alerta de Erro -->
-      <div v-if="errorMessage" class="p-3.5 bg-rose-500/15 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2.5">
-        <TriangleAlert class="w-4 h-4 shrink-0 text-rose-400" />
+      <div v-if="errorMessage" class="login-error flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs text-rose-700">
+        <TriangleAlert class="h-4 w-4 shrink-0 text-rose-600" />
         <span>{{ errorMessage }}</span>
       </div>
 
       <!-- Formulário de Autenticação -->
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">E-mail Corporativo</label>
+          <label class="mb-1.5 block text-xs font-semibold text-slate-700">E-mail Corporativo</label>
           <input
             v-model="email"
             type="email"
             required
             placeholder="usuario@mineracao.com.br"
-            class="w-full bg-slate-950 border border-slate-700/60 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition-colors font-sans"
+            class="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-amber-600 focus:outline-none font-sans"
           />
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Senha de Acesso</label>
+          <label class="mb-1.5 block text-xs font-semibold text-slate-700">Senha de Acesso</label>
           <input
             v-model="senha"
             type="password"
             required
             placeholder="Digite sua senha"
-            class="w-full bg-slate-950 border border-slate-700/60 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition-colors font-sans"
+            class="min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-amber-600 focus:outline-none font-sans"
           />
         </div>
 
         <button
           type="submit"
           :disabled="loading"
-          class="w-full py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl text-xs transition-all interactive-lift flex items-center justify-center gap-2 disabled:opacity-50 shadow-md shadow-amber-500/10"
+          class="interactive-lift flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-bold text-slate-950 shadow-md shadow-amber-500/10 transition-all hover:bg-amber-400 disabled:opacity-50"
         >
           <Loader2 v-if="loading" class="w-4 h-4 animate-spin text-slate-950" />
           <span v-else>Entrar no Sistema</span>
@@ -68,35 +64,37 @@
       </form>
 
       <!-- Acesso Rápido para Avaliação -->
-      <div class="pt-4 border-t border-white/5 space-y-2.5">
-        <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider block text-center font-bold">
+      <div class="space-y-2.5 border-t border-slate-100 pt-4">
+        <span class="block text-center text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
           Credenciais Predefinidas de Acesso
         </span>
         <div class="grid grid-cols-2 gap-2.5">
           <button
             type="button"
             @click="fillAdmin"
-            class="p-3 rounded-xl bg-slate-950/80 hover:bg-slate-900 border border-white/5 text-left transition-all interactive-lift"
+            class="interactive-lift rounded-xl border border-slate-200 bg-slate-50 p-3 text-left transition-all hover:bg-slate-100"
           >
-            <div class="text-xs font-bold text-amber-400">Gestor CCO</div>
-            <div class="text-[11px] text-slate-400 mt-0.5">Perfil Admin (Painel Web)</div>
+            <div class="text-xs font-bold text-amber-800">Gestor CCO</div>
+            <div class="mt-0.5 text-[11px] text-slate-500">Perfil Admin (Painel Web)</div>
           </button>
 
           <button
             type="button"
             @click="fillOperador"
-            class="p-3 rounded-xl bg-slate-950/80 hover:bg-slate-900 border border-white/5 text-left transition-all interactive-lift"
+            class="interactive-lift rounded-xl border border-slate-200 bg-slate-50 p-3 text-left transition-all hover:bg-slate-100"
           >
-            <div class="text-xs font-bold text-sky-400">Operador</div>
-            <div class="text-[11px] text-slate-400 mt-0.5">Terminal Móvel de Campo</div>
+            <div class="text-xs font-bold text-sky-700">Operador</div>
+            <div class="mt-0.5 text-[11px] text-slate-500">Terminal Móvel de Campo</div>
           </button>
         </div>
       </div>
     </div>
 
+    <ThemeToggle class="absolute right-4 top-4 z-10 sm:right-6 sm:top-6" />
+
     <!-- Rodapé Técnico -->
     <footer class="mt-6 text-center text-xs text-slate-500 font-mono">
-      MinasLux • Iluminação Inteligente para Minas • 2026
+      SI Luma • Iluminação inteligente para minas
     </footer>
   </div>
 </template>
@@ -105,7 +103,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import { Radio, TriangleAlert, Loader2 } from 'lucide-vue-next';
+import ThemeToggle from '../components/ThemeToggle.vue';
+import { TriangleAlert, Loader2 } from 'lucide-vue-next';
 
 const email = ref('admin@mineracao.com.br');
 const senha = ref('admin123');

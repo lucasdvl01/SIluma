@@ -3,12 +3,38 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+    --surface-base: #f5f7fa;
+    --surface-raised: #ffffff;
+    --surface-inset: #f1f5f9;
+    --line-subtle: #e2e8f0;
+    --text-muted: #64748b;
+    --accent-amber: #b45309;
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --surface-base: #080d17;
+    --surface-raised: #101827;
+    --surface-inset: #070b13;
+    --line-subtle: rgba(148, 163, 184, 0.13);
+    --text-muted: #94a3b8;
+    --accent-amber: #fbbf24;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #060911;
-    color: #e2e8f0;
+    background: #f5f7fa;
+    background-attachment: fixed;
+    color: #1e293b;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  :root[data-theme='dark'] body {
+    background: #060911;
+    color: #e2e8f0;
   }
 
   /* Números tabulares monospaçados para telemetria sem jitter */
@@ -20,6 +46,33 @@
     font-family: 'JetBrains Mono', monospace;
     font-feature-settings: "zero" 1;
   }
+
+  :focus-visible {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+  }
+
+  button, a, input, select, textarea, summary {
+    touch-action: manipulation;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  input,
+  select,
+  textarea {
+    border-radius: 0.75rem;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: rgba(251, 191, 36, 0.75);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.11);
+  }
 }
 
 /* Custom Scrollbars elegantes e industriais */
@@ -28,27 +81,38 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #080d17;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1c273c;
-  border-radius: 2px;
+  background: #cbd5e1;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2b3d5b;
+  background: #94a3b8;
 }
 
-/* Painel Industrial Tátil: Eliminação do visual genérico de template */
+html[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: #080d17;
+}
+
+html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 .tactile-panel {
-  background: linear-gradient(180deg, #101726 0%, #0a0e17 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: #ffffff;
+  border: 1px solid var(--line-subtle);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -18px rgba(15, 23, 42, 0.2);
 }
 
 .tactile-well {
-  background: #070a12;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 /* Cones de iluminação física realística emitidos pelas luminárias */
@@ -68,26 +132,26 @@
 .segmented-control {
   display: inline-flex;
   padding: 3px;
-  background-color: #070b13;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .scada-panel {
-  background-color: #0c1322;
-  border: 1px solid #182438;
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+  border: 1px solid var(--line-subtle);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -18px rgba(15, 23, 42, 0.2);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .scada-panel:hover {
-  border-color: #243552;
+  border-color: #cbd5e1;
 }
 
 .scada-subtle {
-  background-color: #080d18;
-  border: 1px solid #141c2c;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
 /* Efeito de elevação tátil para botões e cartões de alta performance */
@@ -99,4 +163,513 @@
 }
 .interactive-lift:active {
   transform: translateY(0);
+}
+
+.page-header {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--line-subtle);
+  border-radius: 1.25rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -18px rgba(15, 23, 42, 0.2);
+}
+
+.page-header h1,
+.page-header h2 {
+  color: #0f172a;
+  font-size: clamp(1.125rem, 1.55vw, 1.375rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+}
+
+.page-header p {
+  max-width: 72ch;
+  color: #64748b;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.page-header .page-eyebrow,
+.page-eyebrow {
+  color: #b45309;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.app-main {
+  background: #f5f7fa;
+}
+
+html[data-theme='dark'] .tactile-panel,
+html[data-theme='dark'] .scada-panel {
+  background: linear-gradient(145deg, rgba(17, 27, 44, 0.97) 0%, rgba(10, 15, 25, 0.98) 100%);
+  border-color: var(--line-subtle);
+  box-shadow: 0 12px 32px -22px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+html[data-theme='dark'] .tactile-well {
+  background: #070a12;
+  border-color: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme='dark'] .segmented-control {
+  background-color: #070b13;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+html[data-theme='dark'] .page-header {
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(245, 158, 11, 0.08), transparent 55%),
+    linear-gradient(120deg, rgba(17, 27, 43, 0.96), rgba(10, 15, 25, 0.96));
+  box-shadow: 0 14px 36px -28px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme='dark'] .page-header h1,
+html[data-theme='dark'] .page-header h2 {
+  color: #f8fafc;
+}
+
+html[data-theme='dark'] .page-header p {
+  color: #a5b4c7;
+}
+
+html[data-theme='dark'] .page-header .page-eyebrow,
+html[data-theme='dark'] .page-eyebrow {
+  color: #fbbf24;
+}
+
+html[data-theme='dark'] .app-main {
+  background-color: #080d17 !important;
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(30, 41, 59, 0.12), transparent 55rem) !important;
+}
+
+html[data-theme='dark'] .app-main table thead {
+  background-color: rgba(7, 11, 19, 0.62);
+}
+
+html[data-theme='dark'] .app-main table th {
+  color: #94a3b8;
+}
+
+html[data-theme='dark'] .app-main table tbody tr:hover {
+  background-color: rgba(148, 163, 184, 0.045);
+}
+
+html[data-theme='light'] .app-main table thead {
+  background-color: #f8fafc;
+}
+
+html[data-theme='light'] .app-main table th {
+  color: #64748b;
+}
+
+html[data-theme='light'] .app-main table tbody tr {
+  transition: background-color 140ms ease;
+}
+
+html[data-theme='light'] .app-main table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.operator-terminal button {
+  min-height: 44px;
+}
+
+html[data-theme='light'] .app-main {
+  color: #1e293b;
+}
+
+html[data-theme='light'] .app-main .text-white {
+  color: #0f172a;
+}
+
+html[data-theme='light'] .app-main button.text-white,
+html[data-theme='light'] .app-main a.text-white {
+  color: #ffffff;
+}
+
+html[data-theme='light'] .app-main .text-slate-100,
+html[data-theme='light'] .app-main .text-slate-200 {
+  color: #334155;
+}
+
+html[data-theme='light'] .app-main .text-slate-300 {
+  color: #475569;
+}
+
+html[data-theme='light'] .app-main .text-slate-400,
+html[data-theme='light'] .app-main .text-slate-500 {
+  color: #64748b;
+}
+
+html[data-theme='light'] .app-main .text-amber-100,
+html[data-theme='light'] .app-main .text-amber-200,
+html[data-theme='light'] .app-main .text-amber-300,
+html[data-theme='light'] .app-main .text-amber-400 {
+  color: #b45309;
+}
+
+html[data-theme='light'] .app-main .text-emerald-300,
+html[data-theme='light'] .app-main .text-emerald-400,
+html[data-theme='light'] .app-main .text-emerald-200 {
+  color: #047857;
+}
+
+html[data-theme='light'] .app-main .text-sky-300,
+html[data-theme='light'] .app-main .text-sky-400,
+html[data-theme='light'] .app-main .text-sky-200 {
+  color: #0369a1;
+}
+
+html[data-theme='light'] .app-main .text-rose-300,
+html[data-theme='light'] .app-main .text-rose-100,
+html[data-theme='light'] .app-main .text-rose-200,
+html[data-theme='light'] .app-main .text-rose-400 {
+  color: #be123c;
+}
+
+html[data-theme='light'] .app-main .text-cyan-200,
+html[data-theme='light'] .app-main .text-cyan-300,
+html[data-theme='light'] .app-main .text-cyan-400 {
+  color: #0e7490;
+}
+
+html[data-theme='light'] .app-main .text-blue-200,
+html[data-theme='light'] .app-main .text-blue-300,
+html[data-theme='light'] .app-main .text-blue-400 {
+  color: #1d4ed8;
+}
+
+html[data-theme='light'] .app-main .text-indigo-200,
+html[data-theme='light'] .app-main .text-indigo-300,
+html[data-theme='light'] .app-main .text-indigo-400 {
+  color: #4338ca;
+}
+
+html[data-theme='light'] .app-main .text-violet-200,
+html[data-theme='light'] .app-main .text-violet-300,
+html[data-theme='light'] .app-main .text-violet-400 {
+  color: #6d28d9;
+}
+
+html[data-theme='light'] .app-main .text-purple-200,
+html[data-theme='light'] .app-main .text-purple-300,
+html[data-theme='light'] .app-main .text-purple-400 {
+  color: #7e22ce;
+}
+
+html[data-theme='light'] .app-main .text-red-200,
+html[data-theme='light'] .app-main .text-red-300,
+html[data-theme='light'] .app-main .text-red-400 {
+  color: #b91c1c;
+}
+
+html[data-theme='light'] .app-main .text-orange-200,
+html[data-theme='light'] .app-main .text-orange-300,
+html[data-theme='light'] .app-main .text-orange-400 {
+  color: #c2410c;
+}
+
+html[data-theme='light'] .app-main .text-teal-200,
+html[data-theme='light'] .app-main .text-teal-300,
+html[data-theme='light'] .app-main .text-teal-400 {
+  color: #0f766e;
+}
+
+html[data-theme='light'] .app-main [class*="bg-slate-950"],
+html[data-theme='light'] .app-main [class*="bg-slate-900"],
+html[data-theme='light'] .app-main [class*="bg-slate-800"],
+html[data-theme='light'] .app-main [class*="bg-mina-950"],
+html[data-theme='light'] .app-main [class*="bg-mina-900"],
+html[data-theme='light'] .app-main [class*="bg-mina-850"],
+html[data-theme='light'] .app-main [class*="bg-mina-800"] {
+  background-color: #f1f5f9;
+}
+
+html[data-theme='light'] .app-main [class*="bg-emerald-950"],
+html[data-theme='light'] .app-main [class*="bg-emerald-900"],
+html[data-theme='light'] .app-main [class*="bg-amber-950"],
+html[data-theme='light'] .app-main [class*="bg-amber-900"],
+html[data-theme='light'] .app-main [class*="bg-rose-950"],
+html[data-theme='light'] .app-main [class*="bg-rose-900"] {
+  background-color: #f1f5f9;
+}
+
+html[data-theme='light'] .operator-terminal-shell button.bg-slate-800.text-white {
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
+html[data-theme='light'] .app-main [class*="border-white/"],
+html[data-theme='light'] .app-main [class*="border-slate-700"],
+html[data-theme='light'] .app-main [class*="border-mina-7"],
+html[data-theme='light'] .app-main [class*="divide-white/"] {
+  border-color: #e2e8f0;
+}
+
+html[data-theme='light'] .app-navbar .text-slate-100,
+html[data-theme='light'] .app-navbar .text-slate-200 {
+  color: #334155;
+}
+
+html[data-theme='light'] .app-navbar [class~="text-amber-200"] {
+  color: #92400e;
+}
+
+html[data-theme='light'] .app-navbar [class~="text-amber-400"] {
+  color: #b45309;
+}
+
+html[data-theme='light'] .app-navbar [class~="text-emerald-400"] {
+  color: #047857;
+}
+
+html[data-theme='light'] .app-sidebar [class~="text-amber-300"] {
+  color: #b45309;
+}
+
+html[data-theme='dark'] .app-shell {
+  background-color: #060911 !important;
+  color: #e2e8f0;
+}
+
+html[data-theme='dark'] .app-navbar {
+  background: rgba(8, 13, 23, 0.95);
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+html[data-theme='dark'] .app-navbar .text-slate-800 {
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .app-navbar .text-slate-600,
+html[data-theme='dark'] .app-navbar .text-slate-700 {
+  color: #cbd5e1;
+}
+
+html[data-theme='dark'] .app-navbar .text-slate-300,
+html[data-theme='dark'] .app-navbar .text-slate-400,
+html[data-theme='dark'] .app-navbar .text-slate-500 {
+  color: #94a3b8;
+}
+
+html[data-theme='dark'] .app-navbar .border-slate-200 {
+  border-color: #273449;
+}
+
+html[data-theme='dark'] .app-navbar .bg-slate-50,
+html[data-theme='dark'] .app-navbar .hover\:bg-slate-100:hover {
+  background-color: #101827;
+}
+
+html[data-theme='dark'] .app-sidebar {
+  background: #080d17;
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+html[data-theme='dark'] .app-sidebar .bg-white {
+  background-color: #080d17;
+}
+
+html[data-theme='dark'] .app-sidebar .bg-slate-50,
+html[data-theme='dark'] .app-sidebar .hover\:bg-slate-50:hover {
+  background-color: #101827;
+}
+
+html[data-theme='dark'] .app-sidebar .border-slate-100,
+html[data-theme='dark'] .app-sidebar .border-slate-200 {
+  border-color: #1e293b;
+}
+
+html[data-theme='dark'] .app-sidebar .text-slate-800 {
+  color: #f1f5f9;
+}
+
+html[data-theme='dark'] .app-sidebar .text-slate-600 {
+  color: #cbd5e1;
+}
+
+html[data-theme='dark'] .app-sidebar .text-slate-500 {
+  color: #94a3b8;
+}
+
+html[data-theme='dark'] .app-sidebar .text-amber-700,
+html[data-theme='dark'] .app-sidebar .text-amber-800 {
+  color: #fbbf24;
+}
+
+html[data-theme='dark'] .app-sidebar .brand-logo {
+  filter: brightness(0) invert(1) !important;
+}
+
+html[data-theme='dark'] .app-sidebar .hover\:text-slate-900:hover {
+  color: #f8fafc;
+}
+
+html[data-theme='dark'] .app-sidebar .bg-amber-50 {
+  background-color: rgba(251, 191, 36, 0.1);
+}
+
+html[data-theme='dark'] .app-sidebar .text-amber-900 {
+  color: #fef3c7;
+}
+
+html[data-theme='dark'] .app-sidebar .border-amber-200,
+html[data-theme='dark'] .app-sidebar .ring-amber-200 {
+  border-color: rgba(251, 191, 36, 0.25);
+  --tw-ring-color: rgba(251, 191, 36, 0.25);
+}
+
+html[data-theme='dark'] .theme-toggle {
+  background-color: #101827;
+  border-color: #273449;
+  color: #cbd5e1;
+}
+
+html[data-theme='dark'] .theme-toggle:hover {
+  background-color: #172236;
+}
+
+html[data-theme='dark'] .login-page {
+  background: #080d17;
+}
+
+html[data-theme='dark'] .login-card {
+  background: #101827;
+  border-color: #273449;
+  box-shadow: 0 24px 64px -36px rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme='dark'] .login-page .brand-logo {
+  filter: brightness(0) invert(1) !important;
+}
+
+html[data-theme='dark'] .login-page .bg-slate-50,
+html[data-theme='dark'] .login-page .hover\:bg-slate-100:hover {
+  background-color: #0b1220;
+}
+
+html[data-theme='dark'] .login-page .border-slate-100,
+html[data-theme='dark'] .login-page .border-slate-200 {
+  border-color: #273449;
+}
+
+html[data-theme='dark'] .login-page .text-slate-900 {
+  color: #f8fafc;
+}
+
+html[data-theme='dark'] .login-page .text-slate-700,
+html[data-theme='dark'] .login-page .text-slate-600 {
+  color: #cbd5e1;
+}
+
+html[data-theme='dark'] .login-page .text-slate-500 {
+  color: #94a3b8;
+}
+
+html[data-theme='dark'] .login-page input {
+  background-color: #070b13;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+html[data-theme='dark'] .login-error {
+  background-color: rgba(225, 29, 72, 0.12);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fda4af;
+}
+
+html[data-theme='dark'] .operator-terminal-shell .tactile-panel,
+html[data-theme='dark'] .operator-terminal-shell .scada-panel {
+  background: linear-gradient(145deg, rgba(17, 27, 44, 0.97) 0%, rgba(10, 15, 25, 0.98) 100%);
+  border-color: rgba(148, 163, 184, 0.13);
+  color: #e2e8f0;
+  box-shadow: 0 12px 32px -22px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+html[data-theme='dark'] .operator-terminal-shell {
+  background: #060911;
+  color: #e2e8f0;
+}
+
+html[data-theme='dark'] .app-main.operator-terminal-shell {
+  background-color: #060911 !important;
+  background-image: none !important;
+}
+
+html[data-theme='dark'] .operator-terminal-shell .page-header {
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(245, 158, 11, 0.08), transparent 55%),
+    linear-gradient(120deg, rgba(17, 27, 43, 0.96), rgba(10, 15, 25, 0.96));
+  border-color: rgba(148, 163, 184, 0.13);
+  box-shadow: 0 14px 36px -28px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme='dark'] .operator-terminal-shell .page-header h1,
+html[data-theme='dark'] .operator-terminal-shell .page-header h2 {
+  color: #f8fafc;
+}
+
+html[data-theme='dark'] .operator-terminal-shell .page-header p {
+  color: #a5b4c7;
+}
+
+html[data-theme='dark'] .operator-terminal-shell .page-eyebrow {
+  color: #fbbf24;
+}
+
+html[data-theme='light'] .operator-terminal-shell {
+  background-color: #f5f7fa;
+  background-image: none;
+  color: #1e293b;
+}
+
+html[data-theme='light'] .operator-terminal-shell .tactile-panel,
+html[data-theme='light'] .operator-terminal-shell .scada-panel {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -18px rgba(15, 23, 42, 0.2);
+}
+
+html[data-theme='light'] .operator-terminal-shell .page-header {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -18px rgba(15, 23, 42, 0.2);
+}
+
+html[data-theme='light'] .operator-terminal-shell .page-header h1,
+html[data-theme='light'] .operator-terminal-shell .page-header h2 {
+  color: #0f172a;
+}
+
+html[data-theme='light'] .operator-terminal-shell .page-header p {
+  color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

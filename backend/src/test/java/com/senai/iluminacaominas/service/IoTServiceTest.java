@@ -67,7 +67,9 @@ class IoTServiceTest {
         assertTrue(response.isInstrucaoLed());
         assertEquals(255, response.getIntensidadePwm());
         assertEquals("ALTA_VISIBILIDADE_CERRACAO", response.getModoLuz());
+        assertEquals("AMBAR", response.getCorLedSugerida());
         assertEquals(TowerStatus.ALERTA_BAIXA_VISIBILIDADE, mockTower.getStatus());
+        assertEquals("AMBAR", response.getCorLedSugerida());
         assertTrue(mockTower.isAlertaBaixaVisibilidade());
 
         verify(telemetryRepository, times(1)).save(any(IoTTelemetry.class));
@@ -108,5 +110,46 @@ class IoTServiceTest {
         assertTrue(poll.isModoCerracao());
         assertEquals("AMBAR", poll.getCorLedSugerida());
         assertEquals(255, poll.getIntensidadePwm());
+    }
+
+    @Test
+    @DisplayName("Comando de desligamento prevalece sobre alerta de baixa visibilidade")
+    void testDesligadaNaoReligaComAlertaLdr() {
+        mockTower.setLigada(false);
+        mockTower.setStatus(TowerStatus.DESLIGADA);
+        when(towerRepository.findByCodigoIdentificacao("TR-001")).thenReturn(Optional.of(mockTower));
+
+        TelemetryRequestDTO telemetry = TelemetryRequestDTO.builder()
+                .codigoTorre("TR-001")
+                .luminosidadeLdr(150)
+                .pressaoBotaoCerracao(false)
+                .build();
+
+        TelemetryResponseDTO response = ioTService.processTelemetry(telemetry, "192.168.1.50");
+
+        assertTrue(response.isAlertaAtivado());
+        assertFalse(response.isInstrucaoLed());
+        assertEquals("APAGADO", response.getCorLedSugerida());
+        assertFalse(mockTower.isLigada());
+    }
+
+    @Test
+    @DisplayName("Falha técnica mantém LED vermelho mesmo com alerta de baixa visibilidade")
+    void testFalhaTecnicaAcendeLedVermelho() {
+        mockTower.setStatus(TowerStatus.FALHA_TECNICA);
+        when(towerRepository.findByCodigoIdentificacao("TR-001")).thenReturn(Optional.of(mockTower));
+
+        TelemetryRequestDTO telemetry = TelemetryRequestDTO.builder()
+                .codigoTorre("TR-001")
+                .luminosidadeLdr(150)
+                .pressaoBotaoCerracao(false)
+                .build();
+
+        TelemetryResponseDTO response = ioTService.processTelemetry(telemetry, "192.168.1.50");
+
+        assertEquals(TowerStatus.FALHA_TECNICA, mockTower.getStatus());
+        assertEquals("VERMELHO", response.getCorLedSugerida());
+        assertEquals(255, response.getIntensidadePwm());
+        assertTrue(response.isInstrucaoLed());
     }
 }

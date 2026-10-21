@@ -93,19 +93,19 @@
 
 ---
 
-### UC06: Transmissão e Automação IoT via Sensor LDR / Botão de Cerração
-- **Atores:** Módulo Wi-Fi ESP32 / Arduino (ou Simulador IoT)
-- **Pré-condições:** Backend ativo recebendo conexões na porta 8080.
+### UC06: Transmissão e Automação IoT via Arduino Mega
+- **Atores:** Arduino Mega 2560, ponte USB/HTTP e simulador IoT
+- **Pré-condições:** Backend ativo na porta 8080; para o circuito físico, ponte serial ativa no computador.
 - **Fluxo Principal:**
-  1. O módulo ESP32 lê a porta analógica conectada ao fotoresistor LDR e a porta digital do botão de cerração.
-  2. O ESP32 monta um payload JSON com `{ "codigoTorre": "TR-001", "luminosidadeLdr": valor, ... }` e envia via `POST /api/iot/telemetry`.
+  1. O Arduino Mega lê o LDR em A7 e o botão de cerração no pino digital 3.
+  2. O Arduino envia uma linha JSON pela USB; a ponte serial encaminha a telemetria via `POST /api/iot/telemetry`.
   3. O backend recebe a requisição:
      - Se o valor do LDR for menor que 300 (queda de luminosidade por cerração ou noite) OU o botão tiver sido pressionado:
        - O backend altera o status da torre no sistema para **"Alerta de Baixa Visibilidade"** (cor Amarela no mapa).
        - Altera o modo da torre para `ALTA_VISIBILIDADE_CERRACAO`.
        - Responde a requisição HTTP com status 200 e payload contendo instrução: `{ "instrucaoLed": true, "modoLuz": "ALTA_VISIBILIDADE_CERRACAO", "intensidadePwm": 255 }`.
      - Caso a luminosidade esteja normal (> 300) e o alerta estava ativo, normaliza a torre para **"Operacional"**.
-  4. O ESP32 recebe a resposta JSON e ajusta a cor e o brilho do LED RGB físico (ou virtual no simulador) para cor âmbar em potência total.
+  4. A ponte converte a cor sugerida pelo backend em um caractere serial, e o Mega atualiza os LEDs discretos (amarelo para alerta, verde normal, vermelho falha/manutenção, apagado desligada).
 
 ---
 

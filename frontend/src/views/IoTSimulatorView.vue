@@ -1,28 +1,28 @@
 <template>
   <div class="space-y-6 max-w-6xl mx-auto">
     <!-- Top Header SCADA -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-5">
+    <div class="page-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5">
       <div>
-        <div class="flex items-center gap-2 mb-1">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
           <span class="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <Cpu class="w-4 h-4" />
           </span>
-          <h1 class="text-xl font-bold text-white tracking-tight font-sans">
+          <h1 class="font-sans">
             Bancada de Diagnóstico & Telemetria IoT
           </h1>
           <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-xl bg-slate-900 text-slate-300 border border-white/10">
-            Hardware ESP32
+            Simulador virtual
           </span>
         </div>
-        <p class="text-xs text-slate-400">
-          Ensaio e validação do microcontrolador ESP32 / Arduino em comunicação direta com a API Spring Boot via HTTP REST
+        <p class="mt-2">
+          Simulação de sensores e validação das respostas da API Spring Boot, sem conexão ao circuito físico
         </p>
       </div>
 
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-xs">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span class="font-mono text-slate-300 text-[11px]">Wi-Fi: CONECTADO (-62 dBm)</span>
+          <span class="font-mono text-slate-300 text-[11px]">Interface de telemetria IoT</span>
         </div>
         <span class="text-xs font-mono px-2.5 py-1 rounded bg-slate-900 text-amber-400 border border-slate-800">
           POST /api/iot/telemetry
@@ -33,7 +33,7 @@
     <!-- Layout da Bancada Interativa -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Painel Esquerdo: Sensores e Entradas do Dispositivo (7 colunas) -->
-      <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-5">
+      <div class="lg:col-span-7 tactile-panel rounded-2xl p-5 sm:p-6 space-y-5">
         <!-- Cabeçalho do Módulo Hardware -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-3">
           <div class="flex items-center gap-3">
@@ -41,8 +41,8 @@
               <Cpu class="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h3 class="text-sm font-semibold text-slate-100">Dispositivo de Campo: ESP32 DevKit v1</h3>
-              <p class="text-[11px] font-mono text-slate-400">ADC 10-bit • GPIO 34 (LDR) • GPIO 14 (Botão) • GPIO 25/26/27 (RGB)</p>
+              <h3 class="text-sm font-semibold text-slate-100">Entradas virtuais do simulador</h3>
+              <p class="text-[11px] font-mono text-slate-400">LDR • botão de cerração • bateria demonstrativa</p>
             </div>
           </div>
           <span class="text-[11px] font-mono font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded">
@@ -72,7 +72,7 @@
             <div>
               <div class="flex items-center gap-2">
                 <Sun class="w-3.5 h-3.5 text-amber-400" />
-                <span class="text-xs font-semibold text-slate-200">Sensor Fotoelétrico LDR (GPIO 34 / ADC)</span>
+                <span class="text-xs font-semibold text-slate-200">Sensor fotoelétrico LDR (simulado)</span>
                 <span
                   class="text-[10px] font-mono px-2 py-0.5 rounded uppercase font-semibold"
                   :class="ldrValue < 300 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'"
@@ -125,7 +125,7 @@
           </div>
         </div>
 
-        <!-- Botão Físico de Cerração (GPIO 14) & Bateria -->
+        <!-- Botão virtual de cerração e bateria demonstrativa -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Entrada Digital Cerração -->
           <div class="p-4 bg-slate-950 border border-slate-800 rounded space-y-3 flex flex-col justify-between">
@@ -134,7 +134,7 @@
                 <AlertTriangle class="w-3.5 h-3.5 text-amber-400" />
                 <span class="text-xs font-semibold text-slate-200">Botão de Emergência Cerração</span>
               </div>
-              <p class="text-[11px] text-slate-400 mt-1">Interrupção por hardware no pino digital GPIO 14</p>
+              <p class="text-[11px] text-slate-400 mt-1">Entrada virtual enviada à API junto com a telemetria</p>
             </div>
             <button
               @click="triggerFogButton"
@@ -144,7 +144,7 @@
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 active:bg-amber-600'"
             >
               <Power class="w-3.5 h-3.5" />
-              <span>{{ fogButtonPressed ? 'SINAL GPIO 14 ATIVO' : 'Pressionar Pulso Cerração' }}</span>
+              <span>{{ fogButtonPressed ? 'BOTÃO VIRTUAL ATIVO' : 'Pressionar Pulso Cerração' }}</span>
             </button>
           </div>
 
@@ -153,7 +153,7 @@
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-1.5">
                 <Battery class="w-3.5 h-3.5 text-emerald-400" />
-                <span class="text-xs font-semibold text-slate-200">Carga da Bateria (Banco 24V)</span>
+                <span class="text-xs font-semibold text-slate-200">Bateria demonstrativa (não medida)</span>
               </div>
               <span class="text-xs font-mono font-bold text-emerald-400">{{ batteryLevel }}%</span>
             </div>
@@ -197,12 +197,12 @@
       <!-- Painel Direito: Atuador LED RGB e Console HTTP (5 colunas) -->
       <div class="lg:col-span-5 space-y-6">
         <!-- Visualização da Luminária / LED RGB (Item 9 SENAI) -->
-        <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
+        <div class="tactile-panel rounded-2xl p-5 sm:p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
             <div class="flex items-center gap-2">
               <Zap class="w-4 h-4 text-amber-400" />
               <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                Atuador: Luminária LED RGB (GPIO 25, 26, 27)
+                Indicador virtual de estado
               </h4>
             </div>
             <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
@@ -240,7 +240,7 @@
         </div>
 
         <!-- Terminal / Log HTTP em Tempo Real -->
-        <div class="bg-slate-950 border border-slate-800 rounded-lg p-4 space-y-3">
+        <div class="tactile-panel rounded-2xl p-4 sm:p-5 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2">
             <div class="flex items-center gap-2 text-xs font-mono text-slate-300">
               <Terminal class="w-3.5 h-3.5 text-emerald-400" />
@@ -300,8 +300,8 @@ const autoLoop = ref(false);
 const transmitting = ref(false);
 
 const ledOn = ref(true);
-const ledModo = ref('NORMAL');
 const ledPwmValue = ref(200);
+const ledColor = ref('VERDE');
 
 const terminalLogs = ref([]);
 
@@ -309,15 +309,17 @@ let autoTimer = null;
 
 const ledColorHex = computed(() => {
   if (!ledOn.value) return '#475569';
-  if (ledModo.value === 'ALTA_VISIBILIDADE_CERRACAO') return '#f59e0b'; // Âmbar
-  if (ledModo.value === 'ECONOMIA') return '#38bdf8'; // Azul
+  if (ledColor.value === 'VERMELHO') return '#ef4444';
+  if (ledColor.value === 'AMBAR') return '#f59e0b';
+  if (ledColor.value === 'AZUL') return '#38bdf8';
   return '#10b981'; // Verde operacional
 });
 
 const ledStatusTitle = computed(() => {
   if (!ledOn.value) return 'Luminária Apagada (Desligada)';
-  if (ledModo.value === 'ALTA_VISIBILIDADE_CERRACAO') return 'Alta Visibilidade Cerração (Âmbar 100%)';
-  if (ledModo.value === 'ECONOMIA') return 'Modo Econômico de Operação (Azul 50%)';
+  if (ledColor.value === 'VERMELHO') return 'Falha técnica ou manutenção (Vermelho)';
+  if (ledColor.value === 'AMBAR') return 'Alta Visibilidade Cerração (Âmbar 100%)';
+  if (ledColor.value === 'AZUL') return 'Modo Econômico de Operação (Azul 50%)';
   return 'Modo Normal Operacional (Verde 80%)';
 });
 
@@ -344,8 +346,8 @@ const sendTelemetry = async () => {
     const data = res.data;
 
     ledOn.value = data.instrucaoLed;
-    ledModo.value = data.modoLuz;
     ledPwmValue.value = data.intensidadePwm;
+    ledColor.value = data.corLedSugerida || (data.instrucaoLed ? 'VERDE' : 'APAGADO');
 
     if (data.alertaAtivado) {
       addLog(`< 200 OK: ALERTA [${data.mensagem}]`, 'alert');

@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-2xl mx-auto space-y-4 pb-20 select-none">
+  <div class="operator-terminal mx-auto max-w-2xl select-none space-y-4 pb-20">
     
     <!-- Top Cockpit: Identificação do Terminal & Estado de Rede -->
-    <header class="tactile-panel rounded-2xl p-4 flex items-center justify-between">
+    <header class="page-header tactile-panel rounded-2xl p-4 flex items-center justify-between">
       <div class="flex items-center gap-3.5">
         <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
           <Smartphone class="w-5 h-5" />
@@ -14,42 +14,46 @@
               Campo
             </span>
           </div>
-          <p class="text-xs text-slate-400 mt-0.5">Frente de Lavra Ativa • Mina de Ferro</p>
+          <p class="text-sm text-slate-300 mt-1">Ações rápidas e estado das torres atribuídas</p>
         </div>
       </div>
 
-      <!-- Comutador Físico de Rede (Do, don't ask: alternância tátil direta) -->
-      <button
+      <div class="flex flex-col items-end gap-1">
+        <span class="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Modo de teste</span>
+        <button
+        type="button"
         @click="toggleSimulateOffline"
-        class="group flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all interactive-lift border"
+        class="group inline-flex items-center gap-2.5 rounded-xl border px-3.5 py-2 text-xs font-mono font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
         :class="offlineStore.isOnline 
-          ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30 hover:border-emerald-500/50' 
-          : 'bg-rose-950/60 text-rose-300 border-rose-500/30 hover:border-rose-500/50'"
-        title="Alternar entre modo conectado e simulação de perda de sinal"
+          ? 'bg-slate-900 text-slate-200 border-slate-600 hover:border-amber-400/60'
+          : 'bg-amber-950/60 text-amber-200 border-amber-500/40 hover:border-amber-400'"
+        :aria-pressed="!offlineStore.isOnline"
+        :aria-label="offlineStore.isOnline ? 'Simular perda de conexão para testar a fila offline' : 'Encerrar simulação e voltar ao modo conectado'"
+        title="Simulação local para testar a fila offline; não altera a conexão física do dispositivo"
       >
-        <span class="relative flex h-2.5 w-2.5">
-          <span v-if="offlineStore.isOnline" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2.5 w-2.5" :class="offlineStore.isOnline ? 'bg-emerald-400' : 'bg-rose-500'"></span>
-        </span>
-        <span class="tracking-wider">{{ offlineStore.isOnline ? 'SINAL OK' : 'OFFLINE' }}</span>
+        <span class="h-2.5 w-2.5 rounded-full" :class="offlineStore.isOnline ? 'bg-emerald-400' : 'bg-amber-400'"></span>
+        <span class="tracking-wide">{{ offlineStore.isOnline ? 'Simular offline' : 'Teste offline ativo' }}</span>
       </button>
+      </div>
     </header>
 
     <!-- Modeless Toast de Confirmação Rápida -->
     <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 -translate-y-2 scale-95" enter-to-class="opacity-100 translate-y-0 scale-100" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-      <div v-if="statusFeedback" class="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs font-medium flex items-center justify-between shadow-lg backdrop-blur-md">
+      <div v-if="statusFeedback" role="status" aria-live="polite" class="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-sm font-medium flex items-center justify-between shadow-lg backdrop-blur-md">
         <div class="flex items-center gap-2.5">
           <CheckCircle2 class="w-4 h-4 text-amber-400 shrink-0" />
           <span>{{ statusFeedback }}</span>
         </div>
-        <button @click="statusFeedback = ''" class="text-amber-400/80 hover:text-white p-1">✕</button>
+        <button type="button" aria-label="Dispensar mensagem" @click="statusFeedback = ''" class="min-h-11 min-w-11 rounded-lg text-amber-300 transition-colors hover:bg-amber-400/10 hover:text-white">✕</button>
       </div>
     </transition>
 
     <!-- Fila Offline Pendente (com botão de sincronização em 1 toque) -->
     <div
       v-if="offlineStore.pendingCount > 0"
-      class="p-3.5 bg-amber-500/15 border border-amber-500/40 rounded-2xl flex items-center justify-between text-xs text-amber-200 shadow-md animate-pulse"
+      role="status"
+      aria-live="polite"
+      class="p-3.5 bg-amber-500/15 border border-amber-500/40 rounded-2xl flex items-center justify-between text-sm text-amber-100 shadow-md"
     >
       <div class="flex items-center gap-2.5">
         <Clock class="w-4 h-4 text-amber-400 shrink-0" />
@@ -174,6 +178,35 @@
 
     <!-- Lista de Cartões Industriais Táticos (Com Metáfora Visual de Iluminação Real) -->
     <div class="space-y-4">
+      <div
+        v-if="loadError"
+        role="alert"
+        class="flex flex-col gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <span>Não foi possível carregar as torres. {{ towerStore.towers.length ? 'Os dados em cache continuam visíveis.' : 'Verifique a conexão e tente novamente.' }}</span>
+        <button
+          type="button"
+          class="inline-flex min-h-11 items-center justify-center rounded-lg border border-rose-400/30 px-3 font-semibold hover:bg-rose-400/10 focus-visible:ring-2 focus-visible:ring-rose-300"
+          :disabled="loadingTowers"
+          @click="loadTowers"
+        >
+          Tentar novamente
+        </button>
+      </div>
+
+      <div v-if="loadingTowers && towerStore.towers.length === 0" role="status" aria-live="polite" class="tactile-panel rounded-2xl p-6 text-center text-sm text-slate-300">
+        Carregando torres…
+      </div>
+
+      <div v-else-if="!loadingTowers && filteredTowers.length === 0" role="status" class="tactile-panel rounded-2xl p-6 text-center">
+        <p class="text-sm font-semibold text-slate-100">
+          {{ towerStore.towers.length ? 'Nenhuma torre corresponde a esses filtros.' : 'Nenhuma torre foi carregada.' }}
+        </p>
+        <p class="mt-1 text-sm text-slate-300">
+          {{ towerStore.towers.length ? 'Altere o estado ou a frente selecionada para ver outros resultados.' : 'Verifique a conexão e tente carregar novamente.' }}
+        </p>
+      </div>
+
       <div
         v-for="tower in filteredTowers"
         :key="tower.id"
@@ -362,7 +395,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useTowerStore } from '../stores/towers';
 import { useOfflineSyncStore } from '../stores/offlineSync';
 import { useMaintenanceStore } from '../stores/maintenance';
@@ -387,6 +420,8 @@ const statusFilter = ref('TODAS');
 const selectedSector = ref('');
 const statusFeedback = ref('');
 const activeReportTowerId = ref(null);
+const loadingTowers = ref(true);
+const loadError = ref(false);
 
 const quickFaultChips = [
   'Luminária Queimada / Apagada',
@@ -402,6 +437,21 @@ const showFeedback = (msg) => {
       statusFeedback.value = '';
     }
   }, 4000);
+};
+
+const loadTowers = async () => {
+  loadingTowers.value = true;
+  loadError.value = false;
+  try {
+    await towerStore.fetchTowers();
+    await towerStore.fetchSectors();
+    towerStore.startPolling(8000);
+  } catch (error) {
+    console.error('Erro ao carregar as torres do terminal:', error);
+    loadError.value = true;
+  } finally {
+    loadingTowers.value = false;
+  }
 };
 
 // Contagens para o Cockpit de 1 Segundo
@@ -471,11 +521,8 @@ const batchActionCurrentSector = async (acao, modo = null) => {
 };
 
 const toggleSimulateOffline = () => {
-  offlineStore.isOnline = !offlineStore.isOnline;
-  showFeedback(`Modo de rede do terminal: ${offlineStore.isOnline ? 'ONLINE (Conectado)' : 'OFFLINE (Fila Local)'}`);
-  if (offlineStore.isOnline) {
-    offlineStore.syncPendingCommands();
-  }
+  offlineStore.setOfflineSimulation(!offlineStore.simulationOffline);
+  showFeedback(`Simulação de conectividade ${offlineStore.simulationOffline ? 'offline ativa' : 'encerrada'}. A rede real do dispositivo não foi alterada.`);
 };
 
 const syncNow = async () => {
@@ -501,10 +548,9 @@ const submitOneTapReport = async (tower, faultTitle) => {
   showFeedback(`OS emitida com sucesso para a torre ${tower.codigoIdentificacao}!`);
 };
 
-onMounted(async () => {
-  offlineStore.init();
-  await towerStore.fetchTowers();
-  await towerStore.fetchSectors();
-  towerStore.startPolling(8000);
+onMounted(loadTowers);
+
+onUnmounted(() => {
+  towerStore.stopPolling();
 });
 </script>

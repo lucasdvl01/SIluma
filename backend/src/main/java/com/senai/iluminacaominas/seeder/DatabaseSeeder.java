@@ -289,7 +289,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .build();
 
         AuditLog aud2 = AuditLog.builder()
-                .usuarioEmail("DISPOSITIVO_ESP32")
+                .usuarioEmail("DISPOSITIVO_IOT")
                 .acao("ALERTA_IOT_LDR")
                 .entidade("LightingTower")
                 .entidadeId(t2.getId().toString())

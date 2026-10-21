@@ -1,26 +1,31 @@
 <template>
-  <aside class="w-64 bg-mina-950/90 backdrop-blur-md border-r border-mina-700/40 flex flex-col h-screen select-none shrink-0 shadow-elevated">
+  <button
+    v-if="mobileOpen"
+    type="button"
+    class="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm lg:hidden"
+    aria-label="Fechar painel lateral"
+    @click="emit('close')"
+  ></button>
+
+  <aside
+    id="primary-navigation"
+    aria-label="Navegação principal"
+    class="app-sidebar fixed inset-y-0 left-0 z-50 flex h-screen w-72 max-w-[calc(100vw-2rem)] shrink-0 flex-col border-r border-slate-200 bg-white shadow-sm transition-transform duration-200 ease-out lg:static lg:z-auto lg:h-screen lg:w-64 lg:translate-x-0"
+    :class="mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+  >
     <!-- Brand / Cabeçalho Institucional CCO (About Face: Postura Soberana) -->
-    <div class="px-5 py-4 border-b border-mina-700/40 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
-        <Radio class="w-5 h-5 text-amber-400 animate-pulse" />
-      </div>
-      <div class="min-w-0">
-        <div class="flex items-center gap-1.5">
-          <span class="font-extrabold text-sm tracking-wider uppercase text-white font-mono">
-            MINAS<span class="text-amber-400">LUX</span>
-          </span>
-          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mina-800 text-slate-400 border border-mina-700/60 font-mono">
-            v1.0
-          </span>
-        </div>
-        <p class="text-[11px] text-slate-400 font-medium truncate tracking-tight">SENAI Betim • CETEM</p>
-      </div>
+    <div class="border-b border-slate-100 px-5 py-5">
+      <img
+        src="/si-luma-logo.svg"
+        alt="SI Luma — Sistema de iluminação"
+        class="brand-logo h-auto w-40"
+      />
+      <p class="mt-2 truncate text-[11px] font-medium tracking-tight text-slate-500">SENAI Betim • CETEM</p>
     </div>
 
     <!-- Navigation Menu (Refactoring UI: Contraste suave, sem bordas pesadas por item) -->
-    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-      <div class="px-3 pt-1 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
+    <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" @click="emit('close')">
+      <div class="px-3 pt-2 pb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500 font-mono">
         {{ authStore.isAdmin ? 'Gestão da Mina (CCO)' : 'Terminal Operacional' }}
       </div>
 
@@ -28,45 +33,45 @@
       <template v-if="authStore.isAdmin">
         <router-link
           to="/dashboard"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
+          class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
           :class="$route.path === '/dashboard' 
-            ? 'bg-amber-500/15 text-amber-300 font-semibold shadow-sm' 
-            : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+            ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <BarChart3 class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/dashboard' ? 'text-amber-400' : 'text-slate-400'" />
+          <BarChart3 class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/dashboard' ? 'text-amber-700' : 'text-slate-500'" />
           <span>Dashboard Indicadores</span>
         </router-link>
 
         <router-link
           to="/mapa"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
+          class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
           :class="$route.path === '/mapa' 
-            ? 'bg-emerald-500/15 text-emerald-300 font-semibold shadow-sm' 
-            : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+            ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <MapPin class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/mapa' ? 'text-emerald-400' : 'text-slate-400'" />
+          <MapPin class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/mapa' ? 'text-amber-700' : 'text-slate-500'" />
           <span>Mapa Operacional</span>
         </router-link>
 
         <router-link
           to="/torres"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
+          class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
           :class="$route.path === '/torres' 
-            ? 'bg-sky-500/15 text-sky-300 font-semibold shadow-sm' 
-            : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+            ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <RadioTower class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/torres' ? 'text-sky-400' : 'text-slate-400'" />
+          <RadioTower class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/torres' ? 'text-amber-700' : 'text-slate-500'" />
           <span>Frota de Torres</span>
         </router-link>
 
         <router-link
           to="/lote"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
+          class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
           :class="$route.path === '/lote' 
-            ? 'bg-cyan-500/15 text-cyan-300 font-semibold shadow-sm' 
-            : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+            ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
         >
-          <Layers class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/lote' ? 'text-cyan-400' : 'text-slate-400'" />
+          <Layers class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/lote' ? 'text-amber-700' : 'text-slate-500'" />
           <span>Comandos em Lote</span>
         </router-link>
       </template>
@@ -74,61 +79,63 @@
       <!-- Links Comuns -->
       <router-link
         to="/manutencoes"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
+        class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
         :class="$route.path === '/manutencoes' 
-          ? 'bg-rose-500/15 text-rose-300 font-semibold shadow-sm' 
-          : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+          ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
       >
-        <Wrench class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/manutencoes' ? 'text-rose-400' : 'text-slate-400'" />
+        <Wrench class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/manutencoes' ? 'text-amber-700' : 'text-slate-500'" />
         <span>Manutenções & Horímetro</span>
       </router-link>
 
       <router-link
         to="/operador"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
+        class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
         :class="$route.path === '/operador' 
-          ? 'bg-amber-500/15 text-amber-300 font-semibold shadow-sm' 
-          : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+          ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
       >
-        <Smartphone class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/operador' ? 'text-amber-400' : 'text-slate-400'" />
+        <Smartphone class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/operador' ? 'text-amber-700' : 'text-slate-500'" />
         <span>Terminal Operador (Campo)</span>
       </router-link>
 
       <router-link
         to="/simulador-iot"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
+        class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
         :class="$route.path === '/simulador-iot' 
-          ? 'bg-emerald-500/15 text-emerald-300 font-semibold shadow-sm' 
-          : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+          ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
       >
-        <Cpu class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/simulador-iot' ? 'text-emerald-400' : 'text-slate-400'" />
-        <span>Bancada IoT (ESP32)</span>
+        <Cpu class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/simulador-iot' ? 'text-amber-700' : 'text-slate-500'" />
+        <span>Bancada IoT (Simulador)</span>
       </router-link>
 
       <router-link
         v-if="authStore.isAdmin"
         to="/auditoria"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group interactive-lift"
-        :class="$route.path === '/auditoria' 
-          ? 'bg-indigo-500/15 text-indigo-300 font-semibold shadow-sm' 
-          : 'text-slate-400 hover:text-slate-100 hover:bg-mina-850'"
+        class="min-h-11 flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium transition-all group interactive-lift"
+        :class="$route.path === '/auditoria'
+          ? 'bg-amber-50 text-amber-900 font-semibold ring-1 ring-amber-200'
+          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
       >
-        <ShieldCheck class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/auditoria' ? 'text-indigo-400' : 'text-slate-400'" />
+        <ShieldCheck class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" :class="$route.path === '/auditoria' ? 'text-amber-700' : 'text-slate-500'" />
         <span>Auditoria & Histórico</span>
       </router-link>
     </nav>
 
     <!-- Footer de Conexão e Perfil do Usuário (Rich Modeless Visual Feedback) -->
-    <div class="p-3 border-t border-mina-700/40 bg-mina-950/80 space-y-2.5">
+    <div class="space-y-2.5 border-t border-slate-100 bg-white p-3">
       <!-- Status Rede Modeless -->
-      <div class="flex items-center justify-between text-[11px] px-3 py-2 rounded-xl bg-mina-900 border border-mina-700/30">
+      <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px]">
         <div class="flex items-center gap-2.5">
           <span class="relative flex h-2 w-2">
-            <span v-if="offlineStore.isOnline" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2" :class="offlineStore.isOnline ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+            <span
+              class="relative inline-flex h-2 w-2 rounded-full"
+              :class="offlineStore.simulationOffline ? 'bg-amber-400' : offlineStore.isOnline ? 'bg-emerald-500' : 'bg-rose-500'"
+            ></span>
           </span>
-          <span class="text-slate-300 font-medium">
-            {{ offlineStore.isOnline ? 'Telemetria: Ativa' : 'Operação Offline' }}
+          <span class="font-medium text-slate-600">
+            {{ offlineStore.simulationOffline ? 'Modo de teste offline' : offlineStore.isOnline ? 'Rede detectada' : 'Sem conexão de rede' }}
           </span>
         </div>
         <span v-if="offlineStore.pendingCount > 0" class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold tabular-nums">
@@ -137,20 +144,20 @@
       </div>
 
       <!-- User Profile Card -->
-      <div class="flex items-center justify-between p-1.5 rounded-xl bg-mina-900/60 border border-mina-700/20">
+      <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-1.5">
         <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-lg bg-mina-800 border border-mina-700 flex items-center justify-center text-xs font-mono font-bold text-amber-400 shrink-0">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-xs font-mono font-bold text-amber-800">
             {{ authStore.userName.substring(0, 2).toUpperCase() }}
           </div>
           <div class="min-w-0">
-            <p class="text-xs font-bold text-slate-100 truncate leading-tight">{{ authStore.userName }}</p>
-            <p class="text-[10px] text-slate-400 font-mono truncate uppercase tracking-wider">{{ authStore.userRole }}</p>
+            <p class="truncate text-xs font-bold leading-tight text-slate-800">{{ authStore.userName }}</p>
+            <p class="truncate text-[10px] uppercase tracking-wider text-slate-500 font-mono">{{ authStore.userRole }}</p>
           </div>
         </div>
         <button
           @click="logout"
           title="Encerrar Sessão"
-          class="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+          class="rounded-lg p-2 text-slate-500 transition-all hover:bg-rose-50 hover:text-rose-600"
         >
           <LogOut class="w-4 h-4" />
         </button>
@@ -164,7 +171,6 @@ import { useAuthStore } from '../stores/auth';
 import { useOfflineSyncStore } from '../stores/offlineSync';
 import { useRouter } from 'vue-router';
 import {
-  Radio,
   BarChart3,
   MapPin,
   RadioTower,
@@ -176,6 +182,14 @@ import {
   LogOut
 } from 'lucide-vue-next';
 
+defineProps({
+  mobileOpen: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const emit = defineEmits(['close']);
 const authStore = useAuthStore();
 const offlineStore = useOfflineSyncStore();
 const router = useRouter();

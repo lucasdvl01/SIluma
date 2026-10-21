@@ -33,8 +33,8 @@ O projeto foi entregue com 100% de cobertura técnica e funcional sobre os requi
 | **Bancos de Dados Dual** | H2 Database (Memória/Dev) + MySQL 8.0 (Container Docker/Prod) | Armazenamento relacional com carga automática de dados de teste (Seed) e migração contínua |
 | **Frontend CCO SCADA** | Vue.js 3 (Composition API), Vite, Tailwind CSS, Lucide Icons, Leaflet GIS, Chart.js | Interface de sala de controle em padrão SCADA industrial dark steel, responsiva, sem vibecoding |
 | **Terminal de Campo** | Vue.js 3 + Pinia Store (Design Ergonomicamente Otimizado) | Visão simplificada para tablets industriais embarcados em veículos com botões para operação com luvas |
-| **Extensão IoT (Firmware)** | C++ para ESP32 DevKit v1 / Arduino | Código de firmware com leitura de ADC para sensor LDR, interrupção por hardware no botão de cerração e controle PWM de LED RGB |
-| **Simulador de Bancada** | HTML5/Vue 3 reativo na Web + Runner Node.js + Wokwi JSON | Ambiente de teste sem dependência de hardware físico, simulando variações climáticas e pacotes HTTP |
+| **Extensão IoT (Firmware)** | C++ para Arduino Mega 2560 | Leitura do LDR e botão; comunicação serial USB com ponte local para a API e LEDs discretos indicadores |
+| **Simulador de Bancada** | HTML5/Vue 3 reativo na Web + Runner Node.js | Ambiente de teste sem dependência de hardware físico, simulando sensores e telemetria |
 | **Infraestrutura DevOps** | Docker, Docker Compose, Nginx Alpine, Multi-stage builds, Scripts `.bat` | Empacotamento de contêineres e automação de inicialização com 1 clique para Windows e Linux |
 | **Testes Automatizados** | JUnit 5, Mockito, AssertJ | Suíte de testes unitários com 100% de sucesso validando regras de telemetria, cálculos e controle |
 
@@ -152,22 +152,22 @@ O projeto foi entregue com 100% de cobertura técnica e funcional sobre os requi
 
 ---
 
-#### 3.9 Bancada de Diagnóstico & Telemetria IoT (Simulador ESP32 / Arduino)
-* **Para que serve:** Ambiente de ensaio e validação em tempo real para o circuito de telemetria IoT, permitindo testar a inteligência do sistema mesmo antes de conectar as placas microcontroladoras físicas nas torres de campo.
+#### 3.9 Bancada de Diagnóstico & Telemetria IoT (Simulador)
+* **Para que serve:** Ambiente virtual de ensaio e validação da API, permitindo testar as regras de telemetria sem conectar o circuito físico.
 * **Como foi desenvolvido:**
-  * No backend, o endpoint `/api/iot/telemetry` recebe o payload JSON enviado pelo ESP32, processa a leitura analógica do sensor de luz e o botão físico de emergência, e responde com a instrução do atuador (LED aceso/apagado, cor, modo e duty cycle de PWM de 0 a 255).
+  * No backend, o endpoint `/api/iot/telemetry` processa as leituras simuladas e responde com o estado sugerido para o indicador.
   * No frontend (`IoTSimulatorView.vue`), a bancada foi estruturada como um osciloscópio / analisador lógico industrial:
     * **Slider do LDR (0 a 1023):** Simula a variação de luminosidade ambiente. Valores abaixo de 300 acionam automaticamente o limiar de alerta de cerração.
     * **Presets de Clima:** Botões rápidos para "Cerração Densa (120)", "Penumbra Noturna (250)" e "Dia Ensolarado (850)".
-    * **Entrada Digital (GPIO 14):** Botão que simula o pressionamento do botão de hardware instalado na torre.
-    * **Slider de Carga de Bateria (5% a 100%):** Transmite o estado de carga do banco de baterias de 24V.
-    * **Atuador Virtual da Luminária:** Lâmpada de ensaio com anel óptico que comuta de cor em tempo real (Verde para modo normal, Âmbar para cerração, Azul para economia) e exibe a modulação PWM recebida do servidor.
+    * **Botão virtual de cerração:** Simula o acionamento do botão do circuito.
+    * **Slider de bateria demonstrativa:** Valor de teste, sem sensor físico correspondente.
+    * **Indicador virtual:** Representa a resposta recebida do servidor; não controla a luminária nem os LEDs do Arduino conectado.
     * **Terminal de Barramento HTTP:** Console com logs de requests e responses HTTP em tempo real.
 * **Como usar:**
   1. Selecione a torre a ser ensaiada no seletor.
   2. Arraste o slider do sensor LDR para menos de 300 ou clique em "Cerração Densa".
   3. Clique em **"Disparar Pacote Telemetria (POST)"** ou ative a opção **"Transmissão Periódica Cíclica (a cada 3s)"**.
-  4. Observe no painel direito a resposta do servidor: a luminária passará para modo Âmbar (Alta Visibilidade) com PWM em 100% (255), e o console registrará o código HTTP 200 OK com os parâmetros de retorno.
+  4. Observe no painel direito a cor e o estado sugeridos pelo servidor; o console registra o resultado da requisição.
 
 ---
 
@@ -178,8 +178,9 @@ O projeto foi entregue com 100% de cobertura técnica e funcional sobre os requi
 ```mermaid
 flowchart TD
     subgraph Campo["CAMPO / HARDWARE & SIMULADORES"]
-        ESP["ESP32 DevKit v1 / Arduino<br/>(LDR GPIO 34, Botão GPIO 14, RGB GPIO 25-27)"]
-        SIM["Simulador Web SCADA / Wokwi / Node.js"]
+        Mega["Arduino Mega 2560<br/>(LDR A7, botão D3, LEDs D47/D49/D51)"]
+        Bridge["Ponte USB/HTTP no computador"]
+        SIM["Simulador Web SCADA / Node.js"]
     end
 
     subgraph CCO["SALA DE CONTROLE (CCO) & OPERAÇÃO"]
@@ -199,7 +200,8 @@ flowchart TD
         MYSQL[("MySQL 8.0 Server em Contêiner<br/>(Perfil de Produção Docker)")]
     end
 
-    ESP -->|"HTTP POST /api/iot/telemetry (JSON)"| CTRL
+    Mega -->|"Telemetria JSON via USB"| Bridge
+    Bridge -->|"HTTP POST /api/iot/telemetry"| CTRL
     SIM -->|"HTTP POST /api/iot/telemetry"| CTRL
     VUE -->|"Axios HTTP + Bearer Token"| SEC
     MOB -->|"Axios HTTP + Bearer Token"| SEC
@@ -259,28 +261,24 @@ $$\text{Emissões Evitadas de } CO_2 \, (kg) = \text{Diesel Poupado} \times 2.68
 
 ---
 
-### 6. EXTENSÃO IOT E FIRMWARE C++
+### 6. EXTENSÃO IOT E FIRMWARE ARDUINO MEGA
 
-O projeto contém o código completo de firmware C++ para microcontroladores **ESP32 DevKit v1** no diretório `iot-simulator/arduino_esp32_firmware.ino`.
+O circuito físico usa o firmware `InoSiluma/InoSiluma.ino` e a ponte
+`iot-simulator/serial_http_bridge.ps1`. A pinagem, montagem e limitações estão
+documentadas em `docs/GUIA_MONTAGEM_ARDUINO_MEGA_SI_LUMA.md`.
 
-#### 6.1 Mapeamento Elétrico de Pinos (Pinout)
-| Componente Físico | Tipo de Sinal | Pino no ESP32 | Função Operacional |
-| :--- | :--- | :--- | :--- |
-| **Sensor LDR (Fotoresistor)** | Analógico (ADC 0-1023) | **GPIO 34** (ADC1_CH6) | Medição contínua da luz natural na torre |
-| **Botão de Emergência Cerração** | Digital (INPUT_PULLUP) | **GPIO 14** | Acionamento manual de emergência pelo operador na base da torre |
-| **LED RGB - Canal Vermelho (R)** | Digital / PWM | **GPIO 25** | Componente vermelho do sinalizador óptico |
-| **LED RGB - Canal Verde (G)** | Digital / PWM | **GPIO 26** | Componente verde do sinalizador óptico |
-| **LED RGB - Canal Azul (B)** | Digital / PWM | **GPIO 27** | Componente azul do sinalizador óptico |
+| Componente | Pino no Arduino Mega | Função |
+| :--- | :--- | :--- |
+| **LDR avulso + resistor de 10 kΩ** | **A7** | Leitura analógica de luminosidade (0-1023) |
+| **Botão de cerração** | **D3** | Entrada `INPUT_PULLUP`, pressionado = `LOW` |
+| **LED vermelho** | **D51** | Falha técnica ou manutenção |
+| **LED verde** | **D49** | Operação normal |
+| **LED amarelo** | **D47** | Baixa visibilidade/modo econômico |
 
-#### 6.2 Ciclo de Execução do Firmware
-1. **Inicialização (`setup`):** Configura os canais PWM (`ledcSetup`), conecta à rede Wi-Fi da mina e sincroniza as diretivas com o CCO.
-2. **Loop Principal (`loop`):**
-   * Realiza a amostragem analógica do sensor LDR no pino 34.
-   * Lê o estado da chave digital de cerração no pino 14 com debounce por software.
-   * Constrói o pacote JSON contendo `codigoTorre`, `luminosidadeLdr`, `statusLed`, `nivelBateria` e `pressaoBotaoCerracao`.
-   * Dispara a requisição HTTP POST para o endpoint `/api/iot/telemetry` do Spring Boot.
-   * Decodifica a resposta JSON do servidor e ajusta as saídas PWM dos GPIOs 25, 26 e 27 de acordo com a instrução recebida.
-   * Aguarda o intervalo de amostragem (padrão de 3000 ms) antes do próximo ciclo.
+O Mega envia telemetria JSON pela USB a cada três segundos. A ponte no computador
+encaminha os dados ao backend via HTTP e retorna um caractere serial para acionar
+o LED indicador. O computador, o backend e a ponte precisam permanecer ativos.
+O nível de bateria é demonstrativo e os LEDs não acionam uma luminária real.
 
 ---
 

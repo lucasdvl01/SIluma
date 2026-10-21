@@ -2,7 +2,7 @@
 **Projeto:** Sistema de Gestão e Monitoramento de Iluminação Inteligente para Minas  
 **Instituição:** SENAI Betim (CETEM Maria Madalena Nogueira)  
 **Área:** Tecnologia da Informação  
-**Stack Tecnológica:** Java 17 (Spring Boot 3.x) + Vue.js 3 + MySQL 8.x + Docker + Arduino/ESP32 (Wokwi / Físico)
+**Stack Tecnológica:** Java 17 (Spring Boot 3.x) + Vue.js 3 + MySQL 8.x + Docker + Arduino Mega 2560 físico com ponte USB/HTTP
 
 ---
 
@@ -15,7 +15,7 @@
 | **RF03** | **Controle das Torres** | O sistema deve conseguir interagir diretamente com as torres. Deve ser possível ligar e desligar as torres remotamente diretamente pelo sistema, além de ativar diferentes modos de energia: **Modo Normal** (100% intensidade), **Modo Economia** (50% intensidade) e **Modo Alta Visibilidade para Cerração** (150% foco para neblina e poeira). | Gestores e Operadores | Alta |
 | **RF04** | **Gestão de Manutenções das Torres** | O sistema deve permitir o registro detalhado de panes reportadas em campo, agendar ordens de serviço (OS) e atribuí-las automaticamente aos técnicos responsáveis. Deve calcular e consolidar as horas de uso contínuo (horímetro) emitindo alertas automáticos aos técnicos nas horas programadas para manutenção preventiva. | Gestores, Técnicos e Operadores | Alta |
 | **RF05** | **Dashboard de Indicadores** | O sistema deve possuir um dashboard executivo exibindo a quantidade de torres em funcionamento versus total, resumo do consumo energético global acumulado (kWh), estimativa de litros de diesel economizados, redução de emissão de CO₂ evitada e gráficos de eficiência por setor e fonte energética. | Administrador (CCO) | Alta |
-| **RF06** | **Transmissão e Leitura de Dados IoT (Arduino/ESP32)** | O sistema deve integrar-se a dispositivos externos via requisições HTTP REST. Deve receber um payload JSON enviado pelo ESP32/Arduino informando a queda de luminosidade detectada pelo sensor LDR (< 300) ou acionamento de botão manual, alterando o status da torre para "Alerta de Baixa Visibilidade" e respondendo com a instrução imediata para acionamento do LED RGB. | Dispositivo IoT, Backend | Alta |
+| **RF06** | **Transmissão e Leitura de Dados IoT (Arduino Mega)** | O sistema deve integrar-se ao circuito demonstrativo por uma ponte USB/HTTP, receber telemetria JSON com leitura do LDR (< 300) ou botão manual e responder com a instrução para os LEDs indicadores do circuito. | Arduino Mega, ponte local, Backend | Alta |
 | **RF07** | **Autenticação de Usuários (Login)** | O sistema deve possuir tela de login para restringir o acesso a usuários autorizados via e-mail e senha criptografada, gerando um token JWT seguro com 24 horas de expiração. | Todos os Usuários | Alta |
 | **RF08** | **Visualização da Frota em Mapa ou Lista** | O sistema deve apresentar a distribuição geográfica das torres ativas no campo em um mapa interativo com imagens de satélite da mina ou em lista tabular detalhada com filtros por setor, trecho e fonte energética. | Administrador e Operador | Média |
 | **RF09** | **Ações e Comandos em Lote (Áreas Remotas)** | O sistema deve permitir o agrupamento de torres por setor para comandos operacionais simultâneos. O operador deve conseguir selecionar um trecho inteiro (ex: "Estrada de Escoamento - Trecho 04") e alterar o modo de todas as torres de uma só vez (ex: ativar modo cerração para toda a via). | Administrador (CCO) | Média |
@@ -38,7 +38,7 @@
 - **RNF-C07 [Desempenho]:** Respostas das requisições de API em menos de 2 segundos sob condições normais.
 - **RNF-C08 [Confiabilidade]:** Logs estruturados via SLF4J + Logback para auditoria e debug.
 - **RNF-C09 [Confiabilidade]:** Rotina de backup do banco de dados estruturada.
-- **RNF-C10 [Escalabilidade]:** Endpoints de API preparados para suportar telemetria contínua de dispositivos IoT (Arduino/ESP32).
+- **RNF-C10 [Escalabilidade]:** Endpoints de API preparados para suportar telemetria contínua de dispositivos IoT.
 - **RNF-C11 [Documentação]:** Documentação viva e interativa dos endpoints através de Swagger / OpenAPI 3.
 - **RNF-C12 [Testes]:** Cobertura de testes unitários e de integração utilizando JUnit 5 e Mockito.
 

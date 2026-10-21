@@ -2,7 +2,7 @@
 
 **Instituição:** SENAI Betim (CETEM Maria Madalena Nogueira)  
 **Área:** Tecnologia da Informação  
-**Stack Tecnológica:** Java 17 (Spring Boot 3.x) + Vue.js 3 (Composition API + TailwindCSS) + MySQL 8.x + Docker + Arduino/ESP32 (Wokwi ou Físico)
+**Stack Tecnológica:** Java 17 (Spring Boot 3.x) + Vue.js 3 (Composition API + TailwindCSS) + MySQL 8.x + Docker + Arduino Mega 2560
 
 > 📘 **Manual Completo do Sistema e Desenvolvimento:**  
 > Consulte o documento oficial detalhado em [MANUAL_DO_SISTEMA_E_DESENVOLVIMENTO.md](./MANUAL_DO_SISTEMA_E_DESENVOLVIMENTO.md) com a explicação exaustiva de cada tela, propósito operacional, engenharia de software e instruções de uso.
@@ -18,7 +18,7 @@ Este sistema foi desenvolvido para realizar a **gestão centralizada e o monitor
 2. **Controle Operacional Remoto e Comandos em Lote:** Acionamento individual ou em lote para setores inteiros da mina (ex: ativar **Modo Cerração** para toda uma estrada de escoamento simultaneamente).
 3. **Gestão de Manutenções com Horímetro Preventivo:** Registro de panes em campo, abertura de Ordens de Serviço (OS) e cálculo contínuo de horas de operação com disparo automático de alerta de revisão preventiva.
 4. **Dashboard Executivo de Sustentabilidade:** Monitoramento do consumo elétrico (kWh), estimativa de litros de diesel economizados e toneladas de CO₂ não emitidas.
-5. **Extensão IoT (Arduino/ESP32):** Automação em tempo real através de sensor de luminosidade LDR (< 300) e botão manual de cerração, enviando telemetria HTTP REST para a API e acionando o LED RGB da luminária.
+5. **Extensão IoT (Arduino Mega 2560):** Leitura de LDR e botão de cerração; o Arduino envia telemetria por USB a uma ponte local, que comunica com a API. LEDs discretos representam os estados da torre.
 6. **Segurança e Auditoria (RBAC & JWT):** Perfis `ADMIN` e `OPERADOR`, senhas criptografadas com BCrypt (fator 10) e rastreamento rigoroso de IP e data/hora em cada operação.
 7. **Aplicativo do Operador com Operação Offline:** Fila local com sincronização automática assim que o dispositivo restabelece sinal de rede celular/Wi-Fi.
 
@@ -73,14 +73,14 @@ Acesse no seu navegador: **[http://localhost:5173](http://localhost:5173)**.
 
 ---
 
-## 💡 4. Extensão IoT e Simuladores (Arduino / ESP32)
+## 💡 4. Extensão IoT e simuladores
 
-O subsistema IoT atende integralmente ao **RF06**, **RNF-C10** e ao **Item 9 (Adicional de Nota)** da especificação SENAI:
+O circuito físico demonstrativo usa Arduino Mega 2560 conectado por USB ao computador. O simulador virtual e o runner Node.js permitem testar a API sem depender do circuito:
 
 ### 1. Bancada de Testes Virtual Integrada na Web:
-- Acesse o sistema e clique em **"Simulador IoT (ESP32)"** no menu lateral.
+- Acesse o sistema e clique em **"Bancada IoT (Simulador)"** no menu lateral.
 - Ajuste o slider do **Sensor LDR** (movendo para baixo de 300 para simular cerração/escuridão) ou pressione o **Botão Cerração**.
-- Acompanhe a requisição HTTP POST e veja a luminária virtual (LED RGB) acender imediatamente na cor âmbar de alta visibilidade!
+- Acompanhe a requisição HTTP POST e veja o indicador virtual refletir a resposta do backend, incluindo o alerta âmbar de baixa visibilidade. Esse indicador não comanda o circuito físico.
 
 ### 2. Simulador Standalone via Linha de Comando (Node.js):
 Para gerar telemetria simultânea contínua de várias torres:
@@ -88,10 +88,10 @@ Para gerar telemetria simultânea contínua de várias torres:
 node iot-simulator/simulator_runner.js
 ```
 
-### 3. Código Firmware Pronto para ESP32 Físico ou Wokwi:
-- Arquivo de código: `iot-simulator/arduino_esp32_firmware.ino`
-- Esquemático Wokwi: `iot-simulator/wokwi_diagram.json`
-- Manual de pinagem: `iot-simulator/README.md`
+### 3. Arduino Mega físico
+- Firmware: `InoSiluma/InoSiluma.ino`
+- Ponte USB/HTTP: `iot-simulator/serial_http_bridge.ps1`
+- Pinagem e roteiro: `docs/GUIA_MONTAGEM_ARDUINO_MEGA_SI_LUMA.md`
 
 ---
 
@@ -113,7 +113,7 @@ O projeto está organizado no repositório Git com as branches exigidas:
 - `develop`: Branch de integração da equipe.
 - `feature/backend-api`: Desenvolvimento da API Spring Boot 3, entidades, segurança e persistência.
 - `feature/frontend-vue`: Desenvolvimento da SPA em Vue 3, Pinia, Tailwind e rotas.
-- `feature/iot-simulator`: Simulador de telemetria, firmware Arduino C++ e esquemático Wokwi.
+- `feature/iot-simulator`: Simulador de telemetria e integração IoT.
 - `test/system-validation`: Suíte de testes unitários com JUnit 5 e Mockito.
 
 ---
