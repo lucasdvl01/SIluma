@@ -7,7 +7,7 @@ Este documento registra o estado conhecido do projeto em **21/10/2026** e organi
 ## Como retomar
 
 1. Abra este arquivo e continue pelo próximo item pendente.
-2. Use a branch `feature/frontend-vue` enquanto termina o circuito e as correções atuais.
+2. Use `main` como versão consolidada para a apresentação; crie uma branch a partir de `main` para novas alterações.
 3. Não apague `backend/h2_data` nem o volume Docker `minas_mysql_volume` sem fazer backup e confirmar que os dados podem ser removidos.
 4. Antes de começar outra tarefa, confira `git status` para preservar alterações locais.
 
@@ -40,7 +40,8 @@ Este documento registra o estado conhecido do projeto em **21/10/2026** e organi
 - [x] O H2 local iniciou e carregou o contexto de Spring durante os testes de backend. A falha posterior de inicialização foi identificada como uma classe compilada inválida em `backend/target`; limpar e reconstruir o backend resolveu o erro.
 - [x] `start-local.bat` executa a limpeza de build antes da inicialização do backend; essa alteração já está no commit publicado `1af6591`.
 - [ ] O PDF `proposta 1 web + arduino.docx.pdf` aparece como arquivo não rastreado no diretório. Ele foi compartilhado para consulta, não deve ser incluído por acidente nos commits.
-- [ ] Não há Pull Request aberto de `feature/frontend-vue` para `develop`.
+- [x] PR #1 (`feature/frontend-vue` → `develop`) e PR #2 (`develop` → `main`) foram integrados em 21/10/2026; não há Pull Requests abertos.
+- [x] A integração final preservou o commit de diagramas `980b431` em `main`; versão publicada: `c02fc99`.
 - [x] O protótipo físico Arduino Mega + LDR + LEDs foi testado com o backend pela ponte USB/HTTP `iot-simulator/serial_http_bridge.ps1`.
 
 ## Fase 1 — Consolidar as correções locais e o Git
@@ -51,9 +52,9 @@ Este documento registra o estado conhecido do projeto em **21/10/2026** e organi
   - [ ] Confirmar que a limpeza de `backend/target` não apaga `backend/h2_data`.
 - [x] Validação final das alterações de remoção do ESP: 10 testes do backend passaram com H2 em memória isolado; build de produção do frontend passou; sintaxe da ponte PowerShell e `git diff --check` passaram.
 - [x] Conferir `git status` e `git diff --check`; os PDFs, os arquivos `.traineddata` e o SVG original foram mantidos fora do commit.
-- [x] Commitar apenas os arquivos pretendidos e enviar para `origin/feature/frontend-vue` (`909d035`).
-- [ ] Abrir um Pull Request de `feature/frontend-vue` para `develop` e registrar os resultados. Não há PR aberto; a criação deve ser concluída em [comparar branches no GitHub](https://github.com/lucasdvl01/SIluma/compare/develop...feature/frontend-vue?expand=1).
-- [ ] Depois da integração em `develop` e da validação final, abrir um Pull Request de `develop` para `main`.
+- [x] Commitar apenas os arquivos pretendidos e enviar para `origin/feature/frontend-vue` (`8e3a69f`).
+- [x] Integrar `feature/frontend-vue` em `develop` pelo [PR #1](https://github.com/lucasdvl01/SIluma/pull/1); merge commit `75f386c`.
+- [x] Integrar `develop` em `main` pelo [PR #2](https://github.com/lucasdvl01/SIluma/pull/2); merge commit `c02fc99`, preservando `980b431`.
 - [ ] Manter `main` como versão estável; configurar proteção da branch para exigir Pull Request/revisão, se disponível no GitHub.
 
 Comandos úteis para revisar os arquivos staged antes do commit:
@@ -100,7 +101,7 @@ Use `docs/1_Documento_de_Requisitos.md` (RF01–RF13 e RNFs), `docs/2_Casos_de_U
 - [ ] Conferir persistência depois de reiniciar containers e documentar backup/restauração do MySQL.
 - [ ] Atualizar README/manual com requisitos de instalação, comandos exatos, URLs, credenciais demonstrativas, firmware Mega/ponte USB e limitações.
 - [ ] Confirmar que segredos reais (Wi-Fi, tokens, senhas pessoais) não estão versionados; manter apenas credenciais claramente identificadas como demonstração.
-- [ ] Fazer revisão final do Pull Request e mesclar primeiro em `develop`, depois em `main`.
+- [x] Fazer revisão final e mesclar por Pull Request primeiro em `develop` e depois em `main` (#1 e #2).
 - [ ] Criar uma tag/versão de entrega e registrar evidências/testes executados.
 
 ## Avisos já observados na validação
